@@ -8,7 +8,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    const string map_file_path = "/home/terchow/HK.graph";
+    const string map_file_path = "./HK.graph";
 
     try
     {
