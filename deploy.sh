@@ -9,7 +9,7 @@
 CMAKE_DIR="ims_cpp_cmake"
 SRC_DIR="ims_cpp"
 WWW_DIR="/var/www/ims_cpp"
-WWW_APP_NAME="ims_cpp"
+WWW_APP_NAME="cpp_server_cppcms"
 
 # Create CMake directory
 if [ ! -d "../${CMAKE_DIR}" ]
@@ -30,7 +30,7 @@ then
     make
 
     # Install
-    sudo cp cpp_server_cppcms/cpp_server_cppcms ${WWW_DIR}/${WWW_APP_NAME}
+    sudo cp cpp_server_cppcms/${WWW_APP_NAME} ${WWW_DIR}
 
     # Restart
     echo "Restarting Server..."
