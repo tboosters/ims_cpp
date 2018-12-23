@@ -24,6 +24,7 @@
 ## Using Graph Builder
 * Graph Builder is a CLI tool for converting and serializing a OSM PBF map file to the MapGraph data structure used in CPP_SERVER_CPPCMS.
 * A serialized MapGraph file is required to start CPP_SERVER_CPPCMS, therefore this tool must be run at least once to provide the required file for the server.
+* Refer to docs in Google Drive for more details.
 
 ## Deploying (Changes to) CPP_SERVER_CPPCMS
 * CPP_SERVER_CPPCMS is the web server for serving routing functionalities.
