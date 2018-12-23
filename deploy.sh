@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Auto deploy script for cpp_server_cppcms
-# Downloads latest code from github -> Build + Install -> Restart
+# Check Updates from Github -> Downloads latest code from master -> Build + Install -> Restart
 # Author: Terence Chow
-# Version 1.1
+# Version 1.2
 
 # Directory variables
 CMAKE_DIR="ims_cpp_cmake"
@@ -11,30 +11,42 @@ SRC_DIR="ims_cpp"
 WWW_DIR="/var/www/ims_cpp"
 WWW_APP_NAME="cpp_server_cppcms"
 
-UPTODATE_MSG="Already up-to-date."
 
-# Create CMake directory
-if [ ! -d "../${CMAKE_DIR}" ]
-then
-	mkdir "../${CMAKE_DIR}"
-fi
+# Check for latest code base
+echo "Checking updates..."
+git remote update
+local_rev=`git rev-parse @{0}`
+remote_rev=`git rev-parse origin/master`
+base_rev=`git merge-base @{0} origin/master`
 
-# Kill current server process
-pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
-if [ ! -z ${pid} ]
-then
-    echo "Killing ${WWW_APP_NAME} at ${pid}..."
-    kill ${pid}
-fi
+if [ ${local_rev} = ${remote_rev} ]; then
+    # Already up to date
+    echo "No updates available."
+
+elif [ ${local_rev} = ${base_rev} ]; then
+    # Local Branch is ahead of remote
+    echo "Local branch is ahead of remote master branch! Consider git stash or git push."
  
+elif [ ${remote_rev} = ${base_rev} ]; then
+    # Update available
 
-# Download latest code base
-echo "Downloading updates..."
-pull_msg=`git pull`
+    # Create CMake directory
+    if [ ! -d "../${CMAKE_DIR}" ]
+    then
+    	mkdir "../${CMAKE_DIR}"
+    fi
 
-echo "${pull_msg}"
-if [ "${pull_msg}" != "${UPTODATE_MSG}" ]
-then
+    # Kill current server process
+    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
+    if [ ! -z ${pid} ]
+    then
+        echo "Killing ${WWW_APP_NAME} at ${pid}..."
+        kill ${pid}
+    fi
+    
+    echo "Downloading updates..."
+    git pull
+
     # Build
     echo "Building..."
     cd ../${CMAKE_DIR}
@@ -44,15 +56,12 @@ then
         make 
         # Install
         sudo cp cpp_server_cppcms/${WWW_APP_NAME} ${WWW_DIR}
+
+        # Restart
+        echo "Restarting Server..."
+        ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
+
     else
         echo "CMake failed!"
     fi
-else
-    # Already up to date
-    echo "No updates available."
 fi
-
-# Restart
-echo "Restarting Server..."
-${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
-
