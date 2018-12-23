@@ -22,16 +22,16 @@ cmake ../ims_cpp
 if [ $? -eq 0 ]
 then
 	make
+
+    # Install
+    sudo cp cpp_server_cppcms/cpp_server_cppcms /var/www/ims_cpp
+
+    # Restart
+    echo "Restarting Server..."
+    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ims_cpp | cut -d"|" -f1`
+    kill ${pid}
+    ./ims_cpp -c config.js &
+
 else
 	echo "CMake failed!"
 fi
-
-# Install
-cd /var/www/ims_cpp
-sudo cp ~/ims_cpp_cmake/cpp_server_cppcms/cpp_server_cppcms .
-
-# Restart
-echo "Restarting Server..."
-pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ims_cpp | cut -d"|" -f1`
-kill ${pid}
-./ims_cpp -c config.js &
