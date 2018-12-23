@@ -11,6 +11,8 @@ SRC_DIR="ims_cpp"
 WWW_DIR="/var/www/ims_cpp"
 WWW_APP_NAME="cpp_server_cppcms"
 
+UPTODATE_MSG="Already up-to-date."
+
 # Create CMake directory
 if [ ! -d "../${CMAKE_DIR}" ]
 then
@@ -28,23 +30,29 @@ fi
 
 # Download latest code base
 echo "Downloading updates..."
-git pull
+pull_msg=`git pull`
 
-# Build
-echo "Building..."
-cd ../${CMAKE_DIR}
-cmake ../${SRC_DIR}
-if [ $? -eq 0 ]
+echo "${pull_msg}"
+if [ "${pull_msg}" != "${UPTODATE_MSG}" ]
 then
-    make
-
-    # Install
-    sudo cp cpp_server_cppcms/${WWW_APP_NAME} ${WWW_DIR}
-
-    # Restart
-    echo "Restarting Server..."
-    ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
-
+    # Build
+    echo "Building..."
+    cd ../${CMAKE_DIR}
+    cmake ../${SRC_DIR}
+    if [ $? -eq 0 ]
+    then
+        make 
+        # Install
+        sudo cp cpp_server_cppcms/${WWW_APP_NAME} ${WWW_DIR}
+    else
+        echo "CMake failed!"
+    fi
 else
-	echo "CMake failed!"
+    # Already up to date
+    echo "No updates available."
 fi
+
+# Restart
+echo "Restarting Server..."
+${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
+
