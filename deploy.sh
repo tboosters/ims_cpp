@@ -17,6 +17,15 @@ then
 	mkdir "../${CMAKE_DIR}"
 fi
 
+# Kill current server process
+pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
+if [ ! -z ${pid} ]
+then
+    echo "Killing ${WWW_APP_NAME} at ${pid}..."
+    kill ${pid}
+fi
+ 
+
 # Download latest code base
 echo "Downloading updates..."
 git pull
@@ -34,11 +43,6 @@ then
 
     # Restart
     echo "Restarting Server..."
-    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
-    if [ ! -z ${pid} ]
-    then
-	kill ${pid}
-    fi
     ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
 
 else
