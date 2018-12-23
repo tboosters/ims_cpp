@@ -25,10 +25,10 @@
 * Graph Builder is a CLI tool for converting and serializing a OSM PBF map file to the MapGraph data structure used in CPP_SERVER_CPPCMS.
 * A serialized MapGraph file is required to start CPP_SERVER_CPPCMS, therefore this tool must be run at least once to provide the required file for the server.
 
-## Deploying CPP_SERVER_CPPCMS
+## Deploying (Changes to) CPP_SERVER_CPPCMS
 * CPP_SERVER_CPPCMS is the web server for serving routing functionalities.
 * For initial deployment: Create MapGraph file ```HK.graph``` with Graph Builder. Copy ```HK.graph``` and ```config.js``` under ```ims_cpp/cpp_server_cppcms``` to ```/var/www/ims_cpp```.
-* Run ```sudo ./deploy.sh``` in the git root directory after each update being pushed to this repository to rebuild and restart the server. (TODO: Add option for user defined MapGraph file path)
+* Run ```sudo ./deploy.sh``` in the git root directory after each update being pushed to this repository to rebuild and restart the server. No rebuild will occur if the code base is already up-to-date. (TODO: Add option for user defined MapGraph file path)
 * The server should now run at localhost:8080.
 
 ## Example
