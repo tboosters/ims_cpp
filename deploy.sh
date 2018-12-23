@@ -34,12 +34,18 @@ then
 
     # Restart
     echo "Restarting Server..."
+<<<<<<< Updated upstream
     pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
     if [ ! -z ${pid} ]
     then
 	kill ${pid}
     fi
     ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
+=======
+    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ims_cpp | cut -d"|" -f1`
+    kill ${pid}
+    /var/www/ims_cpp -c config.js &
+>>>>>>> Stashed changes
 
 else
 	echo "CMake failed!"
