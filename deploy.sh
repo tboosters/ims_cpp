@@ -3,12 +3,18 @@
 # Auto deploy script for cpp_server_cppcms
 # Downloads latest code from github -> Build + Install -> Restart
 # Author: Terence Chow
-# Version 1.0
+# Version 1.1
+
+# Directory variables
+CMAKE_DIR="ims_cpp_cmake"
+SRC_DIR="ims_cpp"
+WWW_DIR="/var/www/ims_cpp"
+WWW_APP_NAME="ims_cpp"
 
 # Create CMake directory
-if [ ! -d "../ims_cpp_cmake" ]
+if [ ! -d "../${CMAKE_DIR}" ]
 then
-	mkdir ims_cpp_cmake
+	mkdir "../${CMAKE_DIR}"
 fi
 
 # Download latest code base
@@ -17,20 +23,23 @@ git pull
 
 # Build
 echo "Building..."
-cd ../ims_cpp_cmake
-cmake ../ims_cpp
+cd ../${CMAKE_DIR}
+cmake ../${SRC_DIR}
 if [ $? -eq 0 ]
 then
-	make
+    make
 
     # Install
-    sudo cp cpp_server_cppcms/cpp_server_cppcms /var/www/ims_cpp
+    sudo cp cpp_server_cppcms/cpp_server_cppcms ${WWW_DIR}/${WWW_APP_NAME}
 
     # Restart
     echo "Restarting Server..."
-    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ims_cpp | cut -d"|" -f1`
-    kill ${pid}
-    ./ims_cpp -c config.js &
+    pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
+    if [ ! -z ${pid} ]
+    then
+	kill ${pid}
+    fi
+    ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
 
 else
 	echo "CMake failed!"
