@@ -71,7 +71,10 @@ void IMSApp::route()
         route.push_back(elem);
     }
 
-    response().out() << route;
+    cppcms::json::value response_body;
+    response_body["data"] = route;
+
+    response().out() << response_body;
 }
 
 void IMSApp::inject_incident()
