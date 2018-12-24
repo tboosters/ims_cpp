@@ -23,23 +23,21 @@ if [ ${local_rev} = ${remote_rev} ]; then
     # Already up to date
     echo "No updates available."
 
-elif [ ${local_rev} = ${base_rev} ]; then
+elif [ ${remote_rev} = ${base_rev} ]; then
     # Local Branch is ahead of remote
     echo "Local branch is ahead of remote master branch! Consider git stash or git push."
  
-elif [ ${remote_rev} = ${base_rev} ]; then
+elif [ ${local_rev} = ${base_rev} ]; then
     # Update available
 
     # Create CMake directory
-    if [ ! -d "../${CMAKE_DIR}" ]
-    then
+    if [ ! -d "../${CMAKE_DIR}" ]; then
     	mkdir "../${CMAKE_DIR}"
     fi
 
     # Kill current server process
     pid=`ps -Ao "%p|%a" | grep -v "grep" | grep ${WWW_APP_NAME} | cut -d"|" -f1`
-    if [ ! -z ${pid} ]
-    then
+    if [ ! -z ${pid} ]; then
         echo "Killing ${WWW_APP_NAME} at ${pid}..."
         kill ${pid}
     fi
@@ -51,8 +49,7 @@ elif [ ${remote_rev} = ${base_rev} ]; then
     echo "Building..."
     cd ../${CMAKE_DIR}
     cmake ../${SRC_DIR}
-    if [ $? -eq 0 ]
-    then
+    if [ $? -eq 0 ]; then
         make 
         # Install
         sudo cp cpp_server_cppcms/${WWW_APP_NAME} ${WWW_DIR}
