@@ -27,7 +27,7 @@ string get_map_file_path(const int & argc, char ** argv) {
     else
     {
         /* Use default MapGraph file dir: executable directory */
-        const string map_file_dir = get_current_dir();
+        const string map_file_dir = get_exec_dir();
         const string map_file_name = "HK.graph";
         return map_file_dir + "/" + map_file_name;
     }

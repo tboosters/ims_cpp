@@ -6,7 +6,7 @@
 using namespace std;
 
 /* Helper function to get executable directory w.r.t. current working directory from command */
-string get_current_dir();
+string get_exec_dir();
 
 
 #endif

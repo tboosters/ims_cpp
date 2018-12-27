@@ -38,7 +38,7 @@ void IMSApp::check_graph()
 void IMSApp::route()
 {
     /* Load sample_route.json */
-    ifstream sample_route_data(get_current_dir() + "/sample_route.json");
+    ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
     cppcms::json::value all_routes;
     all_routes.load(sample_route_data, true);
 
