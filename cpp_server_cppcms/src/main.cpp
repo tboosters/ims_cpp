@@ -3,17 +3,11 @@
 #include <cppcms/applications_pool.h>
 #include <cppcms/service.h>
 
+#include "utils.h"
 #include "IMSApp.h"
 #include "ims/map_graph.h"
 
 using namespace std;
-
-/* Helper function to get executable directory w.r.t. current working directory from command */
-string get_current_dir(string exec_name)
-{
-    int last_slash = exec_name.rfind("/");
-    return exec_name.substr(0, last_slash);
-}
 
 /* Helper function to get MapGraph file path */
 string get_map_file_path(const int & argc, char ** argv) {
@@ -21,8 +15,7 @@ string get_map_file_path(const int & argc, char ** argv) {
     {
         if(strcmp(argv[3], "-m") == 0)
         {
-            /* Get user defined file path. */
-            return string(argv[4]);
+            return string(argv[4]); /* Get user defined file path. */
         }
         else
         {
@@ -34,8 +27,8 @@ string get_map_file_path(const int & argc, char ** argv) {
     else
     {
         /* Use default MapGraph file dir: executable directory */
+        const string map_file_dir = get_current_dir();
         const string map_file_name = "HK.graph";
-        const string map_file_dir = get_current_dir(string(argv[0]));
         return map_file_dir + "/" + map_file_name;
     }
 }
