@@ -56,6 +56,7 @@ elif [ ${local_rev} = ${base_rev} ]; then
 
         # Restart
         echo "Restarting Server..."
+        cd ${WWW_DIR}
         ${WWW_DIR}/${WWW_APP_NAME} -c ${WWW_DIR}/config.js &
 
     else
