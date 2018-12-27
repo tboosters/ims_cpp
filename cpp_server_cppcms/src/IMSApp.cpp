@@ -41,6 +41,7 @@ void IMSApp::route()
     ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
     cppcms::json::value all_routes;
     all_routes.load(sample_route_data, true);
+    sample_route_data.close();
 
     /* Randomly pick a route */
     srand(time(nullptr));
