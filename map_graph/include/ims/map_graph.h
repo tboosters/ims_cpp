@@ -18,11 +18,15 @@ namespace IMS
     class MapGraph
     {
     private:
+        /*TODO: Add fields and related functions - default_speed, current_travel_time, max_density, current_density, */
         vector<float> latitude;
         vector<float> longitude;
         vector<unsigned> head;
         vector<unsigned> first_out;
-        vector<unsigned> travel_time;
+        vector<unsigned> default_travel_time;
+        vector<unsigned> geo_distance;
+
+    private:
 
         /* Function overload for Boost.Serialization, specifying the serialization scheme */
         friend class boost::serialization::access;
@@ -40,7 +44,8 @@ namespace IMS
             archive & first_out;
 
             /* Edge Information */
-            archive & travel_time;
+            archive & default_travel_time;
+            archive & geo_distance;
         }
 
     public:
@@ -73,7 +78,9 @@ namespace IMS
 
         const vector<unsigned int> &get_first_out() const;
 
-        const vector<unsigned int> &get_travel_time() const;
+        const vector<unsigned int> &get_default_travel_time() const;
+
+        const vector<unsigned int> &get_geo_distance() const;
 
         /* Setters */
         void set_latitude(const vector<float> &latitude);
@@ -84,8 +91,9 @@ namespace IMS
 
         void set_first_out(const vector<unsigned int> &first_out);
 
-        void set_travel_time(const vector<unsigned int> &travel_time);
+        void set_default_travel_time(const vector<unsigned int> &default_travel_time);
 
+        void set_geo_distance(const vector<unsigned int> &geo_distance);
     };
 
 }

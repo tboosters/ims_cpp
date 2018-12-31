@@ -29,8 +29,8 @@ using namespace IMS;
  */
 void compare_serialized_graph()
 {
-    string actual_file_path = "";        //HK.graph;
-    string original_pbf_path = "";       ///media/terchow/Data/U STUDY SOURCES/Year 4/FYP/hong_kong-latest.osm.pbf
+    string actual_file_path;        //HK.graph;
+    string original_pbf_path;       ///media/terchow/Data/U STUDY SOURCES/Year 4/FYP/hong_kong-latest.osm.pbf
 
     /*
      * Read user input for file paths
@@ -64,7 +64,8 @@ void compare_serialized_graph()
         cout << "Latitude and Longitude | " <<
                 (actual.get_latitude() == expected.latitude
                     && actual.get_longitude() == expected.longitude? "Pass" : "Fail") << endl;
-        cout << "Travel time | " << (actual.get_travel_time() == expected.travel_time? "Pass" : "Fail") << endl;
+        cout << "Travel time | " << (actual.get_default_travel_time() == expected.travel_time? "Pass" : "Fail") << endl;
+        cout << "Geo Distance | " << (actual.get_geo_distance() == expected.geo_distance? "Pass" : "Fail") << endl;
     }
     catch (runtime_error &e)
     {

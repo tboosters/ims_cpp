@@ -9,7 +9,7 @@
 using namespace std;
 using namespace IMS;
 
-
+/* Getters */
 const vector<float> &MapGraph::get_latitude() const
 {
     return latitude;
@@ -30,11 +30,17 @@ const vector<unsigned int> &MapGraph::get_first_out() const
     return first_out;
 }
 
-const vector<unsigned int> &MapGraph::get_travel_time() const
+const vector<unsigned int> &MapGraph::get_default_travel_time() const
 {
-    return travel_time;
+    return default_travel_time;
 }
 
+const vector<unsigned int> &MapGraph::get_geo_distance() const
+{
+    return geo_distance;
+}
+
+/* Setters */
 void MapGraph::set_latitude(const vector<float> &latitude)
 {
     MapGraph::latitude = latitude;
@@ -55,7 +61,11 @@ void MapGraph::set_first_out(const vector<unsigned int> &first_out)
     MapGraph::first_out = first_out;
 }
 
-void MapGraph::set_travel_time(const vector<unsigned int> &travel_time)
+void MapGraph::set_default_travel_time(const vector<unsigned int> &default_travel_time)
 {
-    MapGraph::travel_time = travel_time;
+    MapGraph::default_travel_time = default_travel_time;
+}
+
+void MapGraph::set_geo_distance(const vector<unsigned int> &geo_distance){
+    MapGraph::geo_distance = geo_distance;
 }

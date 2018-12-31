@@ -1,5 +1,4 @@
-#include <cstdlib>
-#include <ctime>
+#include <random>
 #include <fstream>
 #include <vector>
 
@@ -44,8 +43,10 @@ void IMSApp::route()
     sample_route_data.close();
 
     /* Randomly pick a route */
-    srand(time(nullptr));
-    cppcms::json::value route = all_routes[rand() % 100];
+    random_device rd;
+    default_random_engine engine(rd());
+    uniform_int_distribution<int> uniform_dist(0, 100);
+    cppcms::json::value route = all_routes[uniform_dist(engine)];
 
     /* Write route to response */
     cppcms::json::value response_body;

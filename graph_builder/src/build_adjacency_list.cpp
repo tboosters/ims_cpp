@@ -31,7 +31,8 @@ void populate_map_graph_from_osm_graph(IMS::MapGraph &graph, const RoutingKit::S
     graph.set_latitude(graph_data.latitude);
     graph.set_head(graph_data.head);
     graph.set_first_out(graph_data.first_out);
-    graph.set_travel_time(graph_data.travel_time);
+    graph.set_default_travel_time(graph_data.travel_time);
+    graph.set_geo_distance(graph_data.geo_distance);
 }
 
 /*
