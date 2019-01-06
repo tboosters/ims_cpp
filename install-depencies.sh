@@ -23,7 +23,7 @@ cd cppcms-1.2.1
 mkdir build
 cd build
 cmake ..
-make
+make -j4
 make install
 cd ../../
 
