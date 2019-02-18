@@ -7,7 +7,7 @@
 * Pull this repository with ```git pull https://github.com/tboosters/ims_cpp.git```.
 * Follow the following instructions.
 
-## Installating Dependencies
+## Installing Dependencies
 * This package depends on CPPCMS, RoutingKit and the Serialization Module of Boost and is tested on Ubuntu 18.04 LTS.
 * Your machine has to be on Ubuntu / Debian for the ```apt``` command. (TODO: Add Mac support)
 * Make sure cmake (version >= 3.10), g++, make, git, wget are available on your machine.
