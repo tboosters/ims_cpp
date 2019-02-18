@@ -3,7 +3,7 @@ project(graph_builder)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(graph_builder src/main.cpp src/build_adjacency_list.cpp src/build_adjacency_list.h src/test_serialized_file.cpp src/test_serialized_file.h)
+add_executable(graph_builder src/main.cpp src/build_mapgraph.cpp src/build_mapgraph.h src/test_serialized_file.cpp src/test_serialized_file.h)
 
 # Dependencies
 # MapGraph and Graph Serializer

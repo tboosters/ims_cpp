@@ -1,10 +1,19 @@
-#ifndef CPP_SERVER_PISTACHE_MAPGRAPH_H
-#define CPP_SERVER_PISTACHE_MAPGRAPH_H
+/*
+ * Header file for map_graph module.
+ * Version: 1.0
+ * Author: Terence Chow
+ */
+
+#ifndef CPP_SERVER_MAPGRAPH_H
+#define CPP_SERVER_MAPGRAPH_H
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
+#include <unordered_map>
+
+#include <routingkit/contraction_hierarchy.h>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -14,11 +23,11 @@ using namespace std;
 
 namespace IMS
 {
-
     class MapGraph
     {
-    private:
-        /*TODO: Add fields and related functions - default_speed, current_travel_time, max_density, current_density, */
+    public:
+        /* TODO: Add fields and related functions - default_speed, current_travel_time, max_density, current_density */
+        /* TODO: Add preprocessed data - layers, distance matrix */
         vector<float> latitude;
         vector<float> longitude;
         vector<unsigned> head;
@@ -26,29 +35,7 @@ namespace IMS
         vector<unsigned> default_travel_time;
         vector<unsigned> geo_distance;
 
-    private:
 
-        /* Function overload for Boost.Serialization, specifying the serialization scheme */
-        friend class boost::serialization::access;
-        template<class Archive>
-        void serialize(Archive &archive, const unsigned int version)
-        {
-            /* Geo-location of nodes */
-            archive & longitude;
-            archive & latitude;
-
-            /* Edges */
-            /* Head node of each edge */
-            archive & head;
-            /* ID of the first of the batch of outward edges from i (i = Tail node of edge) */
-            archive & first_out;
-
-            /* Edge Information */
-            archive & default_travel_time;
-            archive & geo_distance;
-        }
-
-    public:
         /* Initialize from deserialization */
         static MapGraph deserialize(const string& input_file_path)
         {
@@ -61,41 +48,39 @@ namespace IMS
         }
 
         /* Serialization*/
-        void serialize(const string& output_file_path)
-        {
-            ofstream ofs(output_file_path);
-            boost::archive::text_oarchive output_archive_stream(ofs);
-            output_archive_stream << *this;
-            ofs.close();
-        }
+        void serialize(const string& output_file_path);
 
-        /* Getters */
-        const vector<float> &get_latitude() const;
+        /* Pre-processing */
+        void partition(const int &k, const int &l);
 
-        const vector<float> &get_longitude() const;
-
-        const vector<unsigned int> &get_head() const;
-
-        const vector<unsigned int> &get_first_out() const;
-
-        const vector<unsigned int> &get_default_travel_time() const;
-
-        const vector<unsigned int> &get_geo_distance() const;
-
-        /* Setters */
-        void set_latitude(const vector<float> &latitude);
-
-        void set_longitude(const vector<float> &longitude);
-
-        void set_head(const vector<unsigned int> &head);
-
-        void set_first_out(const vector<unsigned int> &first_out);
-
-        void set_default_travel_time(const vector<unsigned int> &default_travel_time);
-
-        void set_geo_distance(const vector<unsigned int> &geo_distance);
+        void preprocess();
     };
 
 }
 
-#endif
+namespace boost
+{
+namespace serialization
+{
+template<class Archive>
+void serialize(Archive &archive, IMS::MapGraph &mapGraph, const unsigned int version)
+{
+    /* Geo-location of nodes */
+    archive & mapGraph.longitude;
+    archive & mapGraph.latitude;
+
+    /* Edges */
+    /* Head node of each edge */
+    archive & mapGraph.head;
+    /* ID of the first of the batch of outward edges from i (i = Tail node of edge) */
+    archive & mapGraph.first_out;
+
+    /* Edge Information */
+    archive & mapGraph.default_travel_time;
+    archive & mapGraph.geo_distance;
+}
+}
+}
+
+
+#endif  //CPP_SERVER_MAPGRAPH_H

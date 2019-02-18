@@ -1,71 +1,45 @@
-//
-// Created by terchow on 12/6/18.
-//
+/*
+ * Data structure of map graph. Stores graph information and provides routing and update operations.
+ * Libraries:
+ * Version: 1.0
+ * Author: Terence Chow
+ */
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <queue>
+#include <algorithm>
+#include <cmath>
+
 #include "../include/ims/map_graph.h"
+#include "partition.h"
 
 using namespace std;
-using namespace IMS;
 
-/* Getters */
-const vector<float> &MapGraph::get_latitude() const
+/* Serialization */
+void IMS::MapGraph::serialize(const string &output_file_path)
 {
-    return latitude;
+    ofstream ofs(output_file_path);
+    boost::archive::text_oarchive output_archive_stream(ofs);
+    output_archive_stream << *this;
+    ofs.close();
 }
 
-const vector<float> &MapGraph::get_longitude() const
+
+/* Pre-processing */
+void IMS::MapGraph::partition
+        (const int &k, const int &l)
 {
-    return longitude;
+    vector<unsigned int> nodes(latitude.size());
+    for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
+
+    IMS::Partition::partition_t * partition = IMS::Partition::do_partition(nodes, latitude, longitude, k, l, 0);
+    IMS::Partition::layer_t layer = IMS::Partition::build_layer(partition, latitude.size());
+    IMS::Partition::print_layer(layer);
 }
 
-const vector<unsigned int> &MapGraph::get_head() const
+void IMS::MapGraph::preprocess()
 {
-    return head;
-}
 
-const vector<unsigned int> &MapGraph::get_first_out() const
-{
-    return first_out;
-}
-
-const vector<unsigned int> &MapGraph::get_default_travel_time() const
-{
-    return default_travel_time;
-}
-
-const vector<unsigned int> &MapGraph::get_geo_distance() const
-{
-    return geo_distance;
-}
-
-/* Setters */
-void MapGraph::set_latitude(const vector<float> &latitude)
-{
-    MapGraph::latitude = latitude;
-}
-
-void MapGraph::set_longitude(const vector<float> &longitude)
-{
-    MapGraph::longitude = longitude;
-}
-
-void MapGraph::set_head(const vector<unsigned int> &head)
-{
-    MapGraph::head = head;
-}
-
-void MapGraph::set_first_out(const vector<unsigned int> &first_out)
-{
-    MapGraph::first_out = first_out;
-}
-
-void MapGraph::set_default_travel_time(const vector<unsigned int> &default_travel_time)
-{
-    MapGraph::default_travel_time = default_travel_time;
-}
-
-void MapGraph::set_geo_distance(const vector<unsigned int> &geo_distance){
-    MapGraph::geo_distance = geo_distance;
 }

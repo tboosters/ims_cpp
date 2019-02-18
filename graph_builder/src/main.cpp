@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "build_adjacency_list.h"
+#include "build_mapgraph.h"
 #include "test_serialized_file.h"
 
 using namespace std;
@@ -22,11 +22,11 @@ const int EXIT_OPTION = 3;
  */
 void print_menu()
 {
-    cout << "╔══════════════════IMS Graph Builder═════════════════╗" << endl;
-    cout << "║ 1: Build graph from PBF file and serialize to file ║" << endl;
-    cout << "║ 2: Test serialized file                            ║" << endl;
-    cout << "║ 3: Exit                                            ║" << endl;
-    cout << "╚════════════════════════════════════════════════════╝" << endl;
+    cout << "╔══════════════════IMS Graph Builder═════════════════════════╗" << endl;
+    cout << "║ 1: Preprocess MapGraph from PBF file and serialize to file ║" << endl;
+    cout << "║ 2: Test serialized file                                    ║" << endl;
+    cout << "║ 3: Exit                                                    ║" << endl;
+    cout << "╚════════════════════════════════════════════════════════════╝" << endl;
     cout << "Selection: ";
 }
 
@@ -47,7 +47,7 @@ int main()
         switch(selection)
         {
             case BUILD_GRAPH_OPTION:
-                build_adjacency_list_entrance();
+                build_mapgraph_entrance();
                 break;
 
             case TEST_FILE_OPTION:

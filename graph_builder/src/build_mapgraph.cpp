@@ -12,7 +12,7 @@
 #include <routingkit/osm_simple.h>
 #include "ims/map_graph.h"
 
-#include "build_adjacency_list.h"
+#include "build_mapgraph.h"
 
 using namespace std;
 using namespace RoutingKit;
@@ -27,12 +27,12 @@ using namespace IMS;
  */
 void populate_map_graph_from_osm_graph(IMS::MapGraph &graph, const RoutingKit::SimpleOSMCarRoutingGraph &graph_data)
 {
-    graph.set_longitude(graph_data.longitude);
-    graph.set_latitude(graph_data.latitude);
-    graph.set_head(graph_data.head);
-    graph.set_first_out(graph_data.first_out);
-    graph.set_default_travel_time(graph_data.travel_time);
-    graph.set_geo_distance(graph_data.geo_distance);
+    graph.longitude = graph_data.longitude;
+    graph.latitude = graph_data.latitude;
+    graph.head = graph_data.head;
+    graph.first_out = graph_data.first_out;
+    graph.default_travel_time = graph_data.travel_time;
+    graph.geo_distance = graph_data.geo_distance;
 }
 
 /*
@@ -43,13 +43,21 @@ void populate_map_graph_from_osm_graph(IMS::MapGraph &graph, const RoutingKit::S
  * Parameters: NIL
  * Return: When graph building and serialization is done.
  */
-void build_adjacency_list_entrance()
+void build_mapgraph_entrance()
 {
-    string input_file_path; ///media/terchow/Data/U STUDY SOURCES/Year 4/FYP/hong_kong-latest.osm.pbf
+    string input_file_path;
     const string output_file_path = "HK.graph";
 
+    int k, l;
+    cout << "Number of Partitions (k): ";
+    cin >> k;
+    cout << "Number of Levels (l): ";
+    cin >> l;
+
+    cin.ignore();           /* Clear input buffer */
     cout << "PBF file path: ";
     getline(cin, input_file_path);
+
     try
     {
         /* Build graph data structure. */
@@ -64,6 +72,13 @@ void build_adjacency_list_entrance()
         cout << "Number of edges: " << graph_data.arc_count() << endl;
         cout << "Tails of edges need to be created separately with invert_inverse_vetor(graph.first_out)" << endl;
         cout << endl;
+
+        /* Perform Partitioning and Pre-processing */
+        cout << "Partitioning..." << endl;
+        graph.partition(k, l);
+
+        cout << "Pre-processing..." << endl;
+        graph.preprocess();
 
         /* Serialize created graph */
         cout << "Start serializing graph..." << endl;
