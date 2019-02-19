@@ -4,7 +4,7 @@
 
 ## Pulling Code
 * Install git on your machine.
-* Pull this repository with ```git pull https://github.com/tboosters/ims_cpp.git```.
+* Clone this repository with ```git clone https://github.com/tboosters/ims_cpp.git```.
 * Follow the following instructions.
 
 ## Installing Dependencies
