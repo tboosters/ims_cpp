@@ -172,4 +172,6 @@ int main()
     cout << IMS::Partition::find_parent(layer, 4, 2);
     cout << endl;
     cout << IMS::Partition::find_parent(layer, 4);
+    
+    IMS::Partition::delete_partition(p);
 }

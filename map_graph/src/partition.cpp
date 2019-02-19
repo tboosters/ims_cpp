@@ -1,6 +1,10 @@
-//
-// Created by terchow on 2/14/19.
-//
+/*
+ * Data structures of partition and layer. Stores layered partition information and parent of each node.
+ * All structs and functions in namespace IMS::Partition.
+ * Version: 1.0
+ * Author: Terence Chow
+ */
+
 #include <iostream>
 #include <cmath>
 #include <queue>
@@ -81,9 +85,8 @@ partition_t * IMS::Partition::do_partition
 
     unordered_map<long, vector<unsigned int> > sub_partitions = grid_partition(nodes, latitude, longitude, k);
     long next_pid = 0;
-    for(auto itr = sub_partitions.begin(); itr != sub_partitions.end(); itr++)
-    {
-        partition_t * sp = do_partition(itr->second, latitude, longitude, k, l - 1, next_pid);
+    for (auto & sub_partition : sub_partitions) {
+        partition_t * sp = do_partition(sub_partition.second, latitude, longitude, k, l - 1, next_pid);
         p->sub_partition.push_back(sp);
         next_pid++;
     }
@@ -253,4 +256,18 @@ long IMS::Partition::find_parent(const IMS::Partition::layer_t &layer, const lon
     }
 
     return parent;
+}
+
+void IMS::Partition::delete_partition(IMS::Partition::partition_t *& p)
+{
+    if(p != nullptr)
+    {
+        for(auto sp : p->sub_partition)
+        {
+            delete_partition(sp);
+        }
+
+        delete p;
+        p = nullptr;
+    }
 }

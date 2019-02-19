@@ -1,6 +1,8 @@
-//
-// Created by terchow on 2/14/19.
-//
+/*
+ * Header file for partition module.
+ * Version: 1.0
+ * Author: Terence Chow
+ */
 
 #ifndef IMS_CPP_PARTITION_H
 #define IMS_CPP_PARTITION_H
@@ -33,9 +35,8 @@ unordered_map<long, vector<unsigned int> > grid_partition
 
 /* Partitioning & Layering */
 partition_t * do_partition
-        (const vector<unsigned int> &nodes, const vector<float> & latitude,
-                                                  const vector<float> & longitude, const int & k, const int & l,
-                                                  const long & partition_id);
+        (const vector<unsigned int> &nodes, const vector<float> & latitude, const vector<float> & longitude,
+                const int & k, const int & l, const long & partition_id);
 
 void index_partition(partition_t * p);
 
@@ -48,7 +49,8 @@ void print_layer(const layer_t & layer);
 
 long find_parent(const layer_t &layer, const long &node, const long &level = -1);
 
-/* TODO: Implement delete function for GC */
+void delete_partition(partition_t *& p);
+
 }
 }
 
