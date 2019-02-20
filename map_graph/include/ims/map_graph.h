@@ -11,29 +11,45 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <map>
 
 #include <routingkit/contraction_hierarchy.h>
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
 
 using namespace std;
 
 namespace IMS
 {
+    struct Path
+    {
+        time_t start_time;
+        time_t end_time;
+        map<time_t, unsigned> enter_times; // <enter_time, edge ID>
+        vector<double[2]> nodes; // [[long, lat]]
+    };
+
     class MapGraph
     {
     public:
-        /* TODO: Add fields and related functions - default_speed, current_travel_time, max_density, current_density */
         /* TODO: Add preprocessed data - layers, distance matrix */
+        /* TODO: Add Incident Management */
+
         vector<float> latitude;
         vector<float> longitude;
         vector<unsigned> head;
         vector<unsigned> first_out;
-        vector<unsigned> default_travel_time;
-        vector<unsigned> geo_distance;
+        vector<unsigned> geo_distance; // meter
+        vector<unsigned> default_travel_time; // seconds
+        vector<unsigned> default_speed; // km/h
+
+        // Density related
+        vector< map<time_t, double> > current_density;
+        // Max Density = 1 / avg. car length = 1 / 5 = 0.2
+        const double max_density = 0.2;
 
 
         /* Initialize from deserialization */
@@ -54,6 +70,10 @@ namespace IMS
         void partition(const int &k, const int &l);
 
         void preprocess();
+
+        /* Routing */
+        Path route(const double & origin_long, const double & origin_lat,
+                const double & dest_long, const double & dest_lat, const time_t & start_time);
     };
 
 }
@@ -78,6 +98,10 @@ void serialize(Archive &archive, IMS::MapGraph &mapGraph, const unsigned int ver
     /* Edge Information */
     archive & mapGraph.default_travel_time;
     archive & mapGraph.geo_distance;
+    archive & mapGraph.default_speed;
+
+    /* Density Information */
+    archive & mapGraph.current_density;
 }
 }
 }

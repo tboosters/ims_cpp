@@ -11,6 +11,8 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
+#include <ims/map_graph.h>
+
 
 #include "../include/ims/map_graph.h"
 #include "partition.h"
@@ -42,4 +44,10 @@ void IMS::MapGraph::partition
 void IMS::MapGraph::preprocess()
 {
 
+}
+
+IMS::Path IMS::MapGraph::route(const double &origin_long, const double &origin_lat, const double &dest_long,
+                               const double &dest_lat, const time_t &start_time)
+{
+    return IMS::Path();
 }
