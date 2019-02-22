@@ -34,7 +34,7 @@ void IMS::MapGraph::partition
     vector<unsigned int> nodes(latitude.size());
     for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
 
-    IMS::Partition::partition_t * partition = IMS::Partition::do_partition(nodes, latitude, longitude, k, l, 0);
+    IMS::Partition::partition_t * partition = IMS::Partition::do_partition(nodes, this, k, l, 0);
     IMS::Partition::layer_t layer = IMS::Partition::build_layer(partition, latitude.size());
     IMS::Partition::print_layer(layer);
 }
