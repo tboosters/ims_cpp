@@ -40,9 +40,13 @@ int main()
     mapGraph->latitude = lat;
     mapGraph->longitude = longi;
     #if N == small
+        mapGraph->first_out.assign(first_out12, first_out12 + N);
+        mapGraph->head.assign(head12, head12 + N);
         mapGraph->geo_distance.assign(geo_distance12, geo_distance12 + N);
         mapGraph->default_travel_time.assign(default_travel_time12, default_travel_time12 + N);
     #elif N == large
+        mapGraph->first_out.assign(first_out120, first_out120 + N);
+        mapGraph->head.assign(head120, head120 + N);
         mapGraph->geo_distance.assign(geo_distance120, geo_distance120 + N);
         mapGraph->default_travel_time.assign(default_travel_time120, default_travel_time120 + N);
     #endif

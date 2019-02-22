@@ -14,10 +14,16 @@
 using namespace std;
 using namespace IMS::Partition;
 
-unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
-        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph, const int &k)
+/* Partition nodes into grids according to their coordinates. Empty grids are omitted.
+ * Parameters: const vector<unsigned> & nodes
+ *             const IMS::MapGraph * graph
+ *             const int & k: number of rows / columns
+ * Return: unordered_map<long, vector<unsigned> >: key: grid ID (disposable); value: list of nodes in the grid
+ */
+unordered_map<long, vector<unsigned> > IMS::Partition::grid_partition
+        (const vector<unsigned> &nodes, const IMS::MapGraph * graph, const int &k)
 {
-    unordered_map<long, vector<unsigned int> > node_partition;
+    unordered_map<long, vector<unsigned> > node_partition;
 
     if(nodes.size() == 1)
     {
@@ -58,23 +64,32 @@ unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
 }
 
 
+/* Recursive function of partitioning
+ * Parameters: const vector<unsigned> & nodes
+ *             const IMS::MapGraph * graph
+ *             const int & k
+ *             const int & l
+ *             const long & partition_id
+ * Return: partition_t
+ */
 partition_t * IMS::Partition::do_partition
-        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph, const int &k, const int &l,
-                                                  const long &partition_id)
+        (const vector<unsigned> &nodes, const IMS::MapGraph *graph, const int &k, const int &l,
+         const unsigned &partition_id)
 {
-    auto p = new IMS::Partition::partition_t;
-    p->partition_id = partition_id;
-    p->node_id = -1;
+    auto p = new IMS::Partition::partition_t();
+    p->id = partition_id;
+    p->is_node = false;
     
     // Determine boundary nodes of the partition
-    for (unsigned int current_node : nodes)
+    for (unsigned current_node : nodes)
     {
-        unsigned int edge_from = graph->first_out[current_node];
-        unsigned int edge_to = (current_node == graph->first_out.size() -1) ? 
+        unsigned first_edge = graph->first_out[current_node];
+        unsigned last_edge = (current_node == graph->first_out.size() -1) ?
                                     (graph->head.size() - 1) : graph->first_out[current_node + 1];
-        for (unsigned int edge_current = edge_from; edge_current <= edge_to; edge_current ++)
+
+        for (unsigned current_edge = first_edge; current_edge < last_edge; current_edge++)
         {
-            if (std::find(nodes.begin(), nodes.end(), graph->head[edge_current]) == nodes.end())
+            if (find(nodes.begin(), nodes.end(), graph->head[current_edge]) == nodes.end())
             {
                 p->boundary_nodes.push_back(current_node);
                 break;
@@ -85,11 +100,11 @@ partition_t * IMS::Partition::do_partition
     if(l == 1)
     {
         vector<IMS::Partition::partition_t*> leaves(nodes.size());
-        for(unsigned int i = 0; i < nodes.size(); i++)
+        for(unsigned i = 0; i < nodes.size(); i++)
         {
             auto leaf = new IMS::Partition::partition_t;
-            leaf->partition_id = nodes[i];
-            leaf->node_id = nodes[i];
+            leaf->id = nodes[i];
+            leaf->is_node = true;
             leaves[i] = leaf;
         }
 
@@ -97,7 +112,7 @@ partition_t * IMS::Partition::do_partition
         return p;
     }
 
-    unordered_map<long, vector<unsigned int> > sub_partitions = grid_partition(nodes, graph, k);
+    unordered_map<long, vector<unsigned> > sub_partitions = grid_partition(nodes, graph, k);
     long next_pid = 0;
     for (auto & sub_partition : sub_partitions) {
         partition_t * sp = do_partition(sub_partition.second, graph, k, l - 1, next_pid);
@@ -110,9 +125,13 @@ partition_t * IMS::Partition::do_partition
 }
 
 
+/* Put unique numbering into partition_id of each level of the partition. Partition_id is unique only within the level.
+ * Parameter: partition_t * p
+ * Return: when indexing is done
+ */
 void IMS::Partition::index_partition(partition_t * p)
 {
-    long pid = 0;
+    unsigned pid = 0;
     int level_node_count = 1;
     int new_level_node_count = 0;
     queue<partition_t*> frontier;
@@ -128,12 +147,12 @@ void IMS::Partition::index_partition(partition_t * p)
             frontier.pop();
 
             // Do stuff with current node
-            curr->partition_id = pid++;
+            curr->id = pid++;
 
             // Expand neighbours
             for(auto sp : curr->sub_partition)
             {
-                if(sp->node_id == -1)
+                if(!sp->is_node)
                 {
                     frontier.push(sp);
                 }
@@ -146,25 +165,26 @@ void IMS::Partition::index_partition(partition_t * p)
     }
 }
 
-/*
- * Layer: Records parent of each node / partition in the partition hierarchy
- * e.g. layer[x][y] = Partition ID of parent of a node / partition y in level x
+/* Build layer_t with partition information in partition_t layer-by-layer.
+ * Parameter: partition_t * p
+ *            const unsigned long & num_of_nodes
+ * Return: layer_t
  * */
 layer_t IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsigned long &num_of_nodes)
 {
     layer_t layer(1);
-    layer[0].push_back(-1);
+    layer[0].push_back(INFINITY);
 
     int level_node_count = 1;
     int new_level_node_count = 0;
-    vector<long> nodes(num_of_nodes);
+    vector<unsigned> nodes(num_of_nodes);
     queue<IMS::Partition::partition_t*> frontier;
     IMS::Partition::partition_t * curr;
     frontier.push(p);
 
     while(!frontier.empty())
     {
-        vector<long> next_level;
+        vector<unsigned> next_level;
         for (int i = 0; i < level_node_count; i++)
         {
             // Get current node
@@ -174,16 +194,16 @@ layer_t IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsign
             // Expand neighbour
             for (auto sp : curr->sub_partition)
             {
-                if(sp->node_id == -1)
+                if(sp->is_node)
                 {
-                    // Partition
-                    frontier.push(sp);
-                    next_level.push_back(curr->partition_id);
+                    // Nodes
+                    nodes[sp->id] = curr->id;
                 }
                 else
                 {
-                    // Nodes
-                    nodes[sp->node_id] = curr->partition_id;
+                    // Partition
+                    frontier.push(sp);
+                    next_level.push_back(curr->id);
                 }
             }
             new_level_node_count += curr->sub_partition.size();
@@ -201,6 +221,10 @@ layer_t IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsign
     return layer;
 }
 
+/* Print the partition structure. Each partition / node is in format of | partition_id (# of children) |.
+ * Parameter: partition_t * p
+ * Return: when partition is printed
+ */
 void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
 {
     int level_node_count = 1;
@@ -218,15 +242,15 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
             frontier.pop();
 
             // Do stuff with current node
-            if(curr->node_id == -1)
+            cout << curr->id << " ";
+            cout << "(" << curr->sub_partition.size() << ") ";
+            cout << "(";
+            for(int i = 0; i < curr->boundary_nodes.size(); i++)
             {
-                cout << curr->partition_id << " ";
+                cout << curr->boundary_nodes[i];
+                cout << (i == curr->boundary_nodes.size()-1? "" : ", ");
             }
-            else
-            {
-                cout << curr->node_id << " ";
-            }
-            cout << "(" << curr->sub_partition.size() << ") | ";
+            cout << ") | ";
 
             // Expand neighbour
             for(auto sp : curr->sub_partition)
@@ -241,6 +265,10 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
     }
 }
 
+/* Print layer structure.
+ * Parameters: const IMS::Partition::layer_t & layer
+ * Return: when layer is printed
+ */
 void IMS::Partition::print_layer(const IMS::Partition::layer_t & layer)
 {
     for(const auto &l : layer)
@@ -253,7 +281,13 @@ void IMS::Partition::print_layer(const IMS::Partition::layer_t & layer)
     }
 }
 
-/* Optional level parameter for immediate parent */
+
+/* Retrieves parent partition of a node at specified level.
+ * Parameters: const IMS::Partition::layer_t & layer
+ *             const long & node
+ *             const long & level: optional, omit to get immediate parent
+ * Return: long: partition_id of parent
+ */
 long IMS::Partition::find_parent(const IMS::Partition::layer_t &layer, const long &node, const long &level/* = -1 */)
 {
     long parent = node;
@@ -273,6 +307,11 @@ long IMS::Partition::find_parent(const IMS::Partition::layer_t &layer, const lon
     return parent;
 }
 
+/* Recursively releases memory allocated to a partition.
+ * Parameters: IMS::Partition::partition_t *& p:
+ *                     Pointer p must be passed by reference such that the value of the pointer itself can be changed
+ * Return: when partition memory is released.
+ */
 void IMS::Partition::delete_partition(IMS::Partition::partition_t *& p)
 {
     if(p != nullptr)

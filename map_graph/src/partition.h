@@ -18,26 +18,36 @@ namespace IMS
 namespace Partition
 {
 
+/* Stores a partition:
+ * Fields: unsigned id: partition / node id
+ *         bool is_node
+ *         vector<unsigned> boundary_nodes
+ *         vector<partition_t*> sub_partition: list of pointers to all children
+ */
 struct partition_t
 {
-    long partition_id;
-    long node_id;
-    vector<long> boundary_nodes;
+    unsigned id;
+    bool is_node;
+    vector<unsigned> boundary_nodes;
     vector<partition_t*> sub_partition;
 };
 typedef struct partition_t partition_t;
 
-typedef vector< vector<long> > layer_t;
+
+/* Records parent of each node / partition in the partition hierarchy
+ * e.g. layer[x][y] = Partition ID of parent of a node / partition y in level x
+ */
+typedef vector< vector<unsigned> > layer_t;
 
 
 /* Partition Scheme */
-unordered_map<long, vector<unsigned int> > grid_partition
+unordered_map<long, vector<unsigned> > grid_partition
         (const vector<unsigned> &nodes, const IMS::MapGraph * graph, const int &k);
 
 /* Partitioning & Layering */
 partition_t * do_partition
-        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph,
-                const int & k, const int & l, const long & partition_id);
+            (const vector<unsigned> &nodes, const IMS::MapGraph *graph,
+             const int &k, const int &l, const unsigned &partition_id);
 
 void index_partition(partition_t * p);
 
