@@ -11,8 +11,6 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
-#include <ims/map_graph.h>
-
 
 #include "../include/ims/map_graph.h"
 #include "partition.h"
@@ -44,6 +42,13 @@ void IMS::MapGraph::partition
 void IMS::MapGraph::preprocess()
 {
 
+}
+
+/* Routing */
+double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
+{
+    auto latest_density = lower_bound(current_density[edge].begin(), current_density[edge].end(), enter_time);
+    return latest_density->second;
 }
 
 IMS::Path IMS::MapGraph::route(const double &origin_long, const double &origin_lat, const double &dest_long,

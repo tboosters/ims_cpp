@@ -34,12 +34,7 @@ void populate_map_graph_from_osm_graph(IMS::MapGraph &graph, const RoutingKit::S
     graph.default_travel_time = graph_data.travel_time;
     graph.geo_distance = graph_data.geo_distance;
 
-    vector<unsigned> default_speed(graph_data.travel_time.size());
-    for(unsigned i = 0; i < default_speed.size(); i++)
-    {
-        default_speed[i] = graph_data.geo_distance[i] / graph_data.travel_time[i];
-    }
-    graph.default_speed = default_speed;
+    graph.initialize();
 }
 
 /*

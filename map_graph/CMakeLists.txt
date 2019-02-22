@@ -3,7 +3,7 @@ project(graph_serializer)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_library(map_graph SHARED src/map_graph.cpp include/ims/map_graph.h src/partition.cpp src/partition.h)
+add_library(map_graph SHARED src/map_graph.cpp include/ims/map_graph.h src/partition.cpp src/partition.h src/routing.cpp src/routing.h)
 add_library(ims::map_graph ALIAS map_graph)
 add_executable(map_graph_test src/map_graph_test.cpp src/partition.cpp src/partition.h)
 
