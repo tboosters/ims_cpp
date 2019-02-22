@@ -51,20 +51,7 @@ namespace IMS
         const double max_density = 0.2;
 
         /* Initialize dynamic fields: default_speed, current_density */
-        void initialize()
-        {
-            default_speed.reserve(default_travel_time.size());
-            for(unsigned i = 0; i < default_speed.size(); i++)
-            {
-                default_speed[i] = geo_distance[i] / default_travel_time[i];
-            }
-
-            current_density.reserve(default_travel_time.size());
-            for (auto &current_density_map : current_density)
-            {
-                current_density_map[0] = 0;
-            }
-        }
+        void initialize();
 
         /* Initialize from deserialization */
         static MapGraph deserialize(const string& input_file_path)

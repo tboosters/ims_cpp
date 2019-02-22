@@ -1,148 +1,19 @@
 #include <iostream>
 
+#include "../include/ims/map_graph.h"
 #include "partition.h"
-#include <ims/map_graph.h>
+#include "routing.h"
+#include "map_graph_test_data.h"
 
 using namespace std;
 
 int main()
 {
-    /* Test Data */
-    float coordinates12[120][2] = {{114.171475f,22.320358f},
-                                   {114.170705f,22.324115f},
-                                   {114.170572f,22.324995f},
-                                   {114.173383f,22.325471f},
-                                   {114.173486f,22.325434f},
-                                   {114.173488f,22.325326f},
-                                   {114.173253f,22.324917f},
-                                   {114.173931f,22.325047f},
-                                   {114.17462f,22.326387f},
-                                   {114.174603f,22.32653f},
-                                   {114.174072f,22.326701f},
-                                   {114.172861f,22.326645f}};
+    /* Prepare test data */
+    #define N 12
+    #define small 12
+    #define large 120
 
-    float coordinates120[120][2] = {{114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f},
-                                    {114.171475f,22.320358f},
-                                    {114.170705f,22.324115f},
-                                    {114.170572f,22.324995f},
-                                    {114.173383f,22.325471f},
-                                    {114.173486f,22.325434f},
-                                    {114.173488f,22.325326f},
-                                    {114.173253f,22.324917f},
-                                    {114.173931f,22.325047f},
-                                    {114.17462f,22.326387f},
-                                    {114.174603f,22.32653f},
-                                    {114.174072f,22.326701f},
-                                    {114.172861f,22.326645f}};
-
-    int N = 12;
     vector<unsigned> nodes(N);
     for(unsigned i = 0; i < N; i++)
     {
@@ -151,18 +22,36 @@ int main()
 
     vector<float> longi(N);
     vector<float> lat(N);
-    for(int i = 0; i < N; i++)
-    {
+    #if N == small
+    for(int i = 0; i < N; i++) {
         longi[i] = coordinates12[i][0];
         lat[i] = coordinates12[i][1];
     }
+    #elif N == large
+    for(int i = 0; i < N; i++)
+    {
+        longi[i] = coordinates120[i][0];
+        lat[i] = coordinates120[i][1];
+    }
+    #endif
 
     /* Driver */
-    IMS::MapGraph * mapGraph;
+    auto mapGraph = new IMS::MapGraph();
     mapGraph->latitude = lat;
     mapGraph->longitude = longi;
+    #if N == small
+        mapGraph->geo_distance.assign(geo_distance12, geo_distance12 + N);
+        mapGraph->default_travel_time.assign(default_travel_time12, default_travel_time12 + N);
+    #elif N == large
+        mapGraph->geo_distance.assign(geo_distance120, geo_distance120 + N);
+        mapGraph->default_travel_time.assign(default_travel_time120, default_travel_time120 + N);
+    #endif
+    mapGraph->initialize();
+
+    /* Partition + Layer tests */
     int k = 2;
     int l = 3;
+
     IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph, k, l, 0);
     IMS::Partition::index_partition(p);
     auto layer = IMS::Partition::build_layer(p, lat.size());
@@ -173,9 +62,25 @@ int main()
     IMS::Partition::print_layer(layer);
     cout << endl << endl;
 
-    cout << IMS::Partition::find_parent(layer, 4, 2);
+    cout << IMS::Partition::find_parent(layer, 4, 2); // expected: 4 for N=12, k=2, l=3
     cout << endl;
-    cout << IMS::Partition::find_parent(layer, 4);
-    
+    cout << IMS::Partition::find_parent(layer, 4); // expected: 4 for N=12, k=2, l=3
+
     IMS::Partition::delete_partition(p);
+
+    /* Routing tests */
+
+    // Find current density
+    // Set density for edge 1 to be 0.1 (half of jam density) at time 100
+    mapGraph->current_density[1][100] = 0.1;
+    // Density of time >= 100 should be 0.1 and time < 100 should be 0
+    assert(mapGraph->find_current_density(1, 99) == 0);
+    assert(mapGraph->find_current_density(1, 100) == 0.1);
+
+    // Weight retrieval function
+    // Travel time needed before time = 100 should be shortest (default)
+    assert(IMS::Routing::retrieve_weight(mapGraph, 1, 99) == mapGraph->default_travel_time[1]);
+    assert(IMS::Routing::retrieve_weight(mapGraph, 1, 100) == 2 * (mapGraph->default_travel_time[1]));
+
+    return 0;
 }
