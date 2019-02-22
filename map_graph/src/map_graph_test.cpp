@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "partition.h"
+#include <ims/map_graph.h>
 
 using namespace std;
 
@@ -157,9 +158,12 @@ int main()
     }
 
     /* Driver */
+    IMS::MapGraph * mapGraph;
+    mapGraph->latitude = lat;
+    mapGraph->longitude = longi;
     int k = 2;
     int l = 3;
-    IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, lat, longi, k, l, 0);
+    IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph, k, l, 0);
     IMS::Partition::index_partition(p);
     auto layer = IMS::Partition::build_layer(p, lat.size());
 

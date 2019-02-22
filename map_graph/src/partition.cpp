@@ -15,8 +15,7 @@ using namespace std;
 using namespace IMS::Partition;
 
 unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
-        (const vector<unsigned int> &nodes, const vector<float> &latitude,
-                                       const vector<float> &longitude, const int &k)
+        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph, const int &k)
 {
     unordered_map<long, vector<unsigned int> > node_partition;
 
@@ -33,10 +32,10 @@ unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
 
     for(const unsigned & n : nodes)
     {
-        lat_max = latitude[n] > lat_max? latitude[n] : lat_max;
-        lat_min = latitude[n] < lat_min? latitude[n] : lat_min;
-        longi_max = longitude[n] > longi_max? longitude[n] : longi_max;
-        longi_min = longitude[n] < longi_min? longitude[n] : longi_min;
+        lat_max = graph->latitude[n] > lat_max? graph->latitude[n] : lat_max;
+        lat_min = graph->latitude[n] < lat_min? graph->latitude[n] : lat_min;
+        longi_max = graph->longitude[n] > longi_max? graph->longitude[n] : longi_max;
+        longi_min = graph->longitude[n] < longi_min? graph->longitude[n] : longi_min;
     }
 
     double col_size = (longi_max - longi_min) / k;
@@ -45,8 +44,8 @@ unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
     for(const unsigned int & n : nodes)
     {
         // Assign the node in partitions in [a, a+1) range
-        int col = (longitude[n] - longi_min) / col_size;
-        int row = (latitude[n] - lat_min) / row_size;
+        int col = (graph->longitude[n] - longi_min) / col_size;
+        int row = (graph->latitude[n] - lat_min) / row_size;
 
         // Assign it to previous partition if the node is at the last boundary
         col = col == k? col-1 : col;
@@ -60,13 +59,14 @@ unordered_map<long, vector<unsigned int> > IMS::Partition::grid_partition
 
 
 partition_t * IMS::Partition::do_partition
-        (const vector<unsigned int> &nodes, const vector<float> &latitude,
-                                                  const vector<float> &longitude, const int &k, const int &l,
+        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph, const int &k, const int &l,
                                                   const long &partition_id)
 {
     auto p = new IMS::Partition::partition_t;
     p->partition_id = partition_id;
     p->node_id = -1;
+    
+
 
     if(l == 1)
     {
@@ -83,10 +83,11 @@ partition_t * IMS::Partition::do_partition
         return p;
     }
 
-    unordered_map<long, vector<unsigned int> > sub_partitions = grid_partition(nodes, latitude, longitude, k);
+    unordered_map<long, vector<unsigned int> > sub_partitions = grid_partition(nodes, graph, k);
     long next_pid = 0;
     for (auto & sub_partition : sub_partitions) {
-        partition_t * sp = do_partition(sub_partition.second, latitude, longitude, k, l - 1, next_pid);
+        partition_t * sp = do_partition(sub_partition.second, graph, k, l - 1, next_pid);
+
         p->sub_partition.push_back(sp);
         next_pid++;
     }

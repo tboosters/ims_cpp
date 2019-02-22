@@ -1,7 +1,7 @@
 /*
  * Header file for partition module.
  * Version: 1.0
- * Author: Terence Chow
+ * Author: Terence Chow & Calvin Yuen
  */
 
 #ifndef IMS_CPP_PARTITION_H
@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <ims/map_graph.h>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ struct partition_t
 {
     long partition_id;
     long node_id;
+    vector<long> boundary_nodes;
     vector<partition_t*> sub_partition;
 };
 typedef struct partition_t partition_t;
@@ -30,12 +32,11 @@ typedef vector< vector<long> > layer_t;
 
 /* Partition Scheme */
 unordered_map<long, vector<unsigned int> > grid_partition
-        (const vector<unsigned> &nodes, const vector<float> &latitude,
-                const vector<float> &longitude, const int &k);
+        (const vector<unsigned> &nodes, const IMS::MapGraph * graph, const int &k);
 
 /* Partitioning & Layering */
 partition_t * do_partition
-        (const vector<unsigned int> &nodes, const vector<float> & latitude, const vector<float> & longitude,
+        (const vector<unsigned int> &nodes, const IMS::MapGraph * graph,
                 const int & k, const int & l, const long & partition_id);
 
 void index_partition(partition_t * p);
