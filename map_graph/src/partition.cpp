@@ -66,7 +66,21 @@ partition_t * IMS::Partition::do_partition
     p->partition_id = partition_id;
     p->node_id = -1;
     
-
+    // Determine boundary nodes of the partition
+    for (unsigned int current_node : nodes)
+    {
+        unsigned int edge_from = graph->first_out[current_node];
+        unsigned int edge_to = (current_node == graph->first_out.size() -1) ? 
+                                    (graph->head.size() - 1) : graph->first_out[current_node + 1];
+        for (unsigned int edge_current = edge_from; edge_current <= edge_to; edge_current ++)
+        {
+            if (std::find(nodes.begin(), nodes.end(), graph->head[edge_current]) == nodes.end())
+            {
+                p->boundary_nodes.push_back(current_node);
+                break;
+            }
+        }
+    }
 
     if(l == 1)
     {
