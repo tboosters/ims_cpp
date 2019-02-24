@@ -1,7 +1,7 @@
 /*
  * Header file for partition module.
  * Version: 1.0
- * Author: Terence Chow & Calvin Yuen
+ * Author: Terence Chow & Yuen Hoi Man
  */
 
 #ifndef IMS_CPP_PARTITION_H

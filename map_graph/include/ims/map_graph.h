@@ -1,7 +1,7 @@
 /*
  * Header file for map_graph module.
  * Version: 1.0
- * Author: Terence Chow
+ * Author: Terence Chow & Yuen Hoi Man
  */
 
 #ifndef CPP_SERVER_MAPGRAPH_H
@@ -66,6 +66,9 @@ namespace IMS
 
         /* Serialization*/
         void serialize(const string& output_file_path);
+
+        /* Inverse */
+        MapGraph inverse();
 
         /* Pre-processing */
         void partition(const int &k, const int &l);

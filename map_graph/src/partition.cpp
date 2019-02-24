@@ -2,7 +2,7 @@
  * Data structures of partition and layer. Stores layered partition information and parent of each node.
  * All structs and functions in namespace IMS::Partition.
  * Version: 1.0
- * Author: Terence Chow
+ * Author: Terence Chow & Yuen Hoi Man
  */
 
 #include <iostream>

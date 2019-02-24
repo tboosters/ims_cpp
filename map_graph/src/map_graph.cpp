@@ -2,7 +2,7 @@
  * Data structure of map graph. Stores graph information and provides routing and update operations.
  * Libraries:
  * Version: 1.0
- * Author: Terence Chow
+ * Author: Terence Chow & Yuen Hoi Man
  */
 
 #include <iostream>
@@ -47,6 +47,53 @@ void IMS::MapGraph::serialize(const string &output_file_path)
     ofs.close();
 }
 
+/** Creates an inversed MapGraph for the current graph that contains edges pointing to the opposite side
+ * Parameter: NUL
+ * Return: MapGraph: inversed
+ */
+IMS::MapGraph IMS::MapGraph::inverse()
+{
+    MapGraph inverse;
+    inverse.latitude = this->latitude;
+    inverse.longitude = this->longitude;
+
+    // recalcuate inversed edges
+    vector <vector <pair <unsigned, unsigned>>> temp_edges;
+    temp_edges.reserve(this->head.size());
+    for (unsigned int current_node = 0; current_node < this->first_out.size(); current_node++)
+    {
+        unsigned first_edge = this->first_out[current_node];
+        unsigned last_edge = (current_node == this->first_out.size() -1) ?
+                                    (this->head.size() - 1) : this->first_out[current_node + 1];
+        for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
+        {
+            temp_edges[this->head[current_edge]].push_back(pair <unsigned, unsigned> (current_edge, current_node));
+        }
+    }
+
+    // translate edges into MapGraph data structure
+    inverse.head.reserve(this->head.size());
+    inverse.first_out.reserve(this->first_out.size());
+    inverse.geo_distance.reserve(this->geo_distance.size());
+    inverse.default_travel_time.reserve(this->default_travel_time.size());
+    inverse.default_speed.reserve(this->default_speed.size());
+    unsigned current_head_position = 0;
+    for (unsigned int new_origin; new_origin < temp_edges.size(); new_origin ++)
+    {
+        inverse.first_out[new_origin] = current_head_position;
+        for (unsigned int new_edge; new_edge < temp_edges[new_origin].size(); new_edge ++)
+        {
+            inverse.head[current_head_position] = temp_edges[new_origin][new_edge].second;
+            inverse.geo_distance[current_head_position] = this->geo_distance[temp_edges[new_origin][new_edge].first];
+            inverse.default_travel_time[current_head_position] = this->default_travel_time[temp_edges[new_origin][new_edge].first];
+            inverse.default_speed[current_head_position] = this->default_speed[temp_edges[new_origin][new_edge].first];
+            current_head_position ++;
+        }
+    }
+
+    return inverse;
+}
+
 
 /* Pre-processing */
 
@@ -55,8 +102,7 @@ void IMS::MapGraph::serialize(const string &output_file_path)
  *             const int & l: number of levels
  * Return: when partitioning is done
  */
-void IMS::MapGraph::partition
-        (const int &k, const int &l)
+void IMS::MapGraph::partition(const int &k, const int &l)
 {
     vector<unsigned int> nodes(latitude.size());
     for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
