@@ -23,11 +23,6 @@ using namespace std;
  * */
 void IMS::MapGraph::initialize()
 {
-    for(unsigned i = 0; i < default_travel_time.size(); i++)
-    {
-        default_speed.push_back(geo_distance[i] / default_travel_time[i]);
-    }
-
     for (unsigned i = 0; i < default_travel_time.size(); i++)
     {
         current_density.emplace_back();

@@ -49,7 +49,6 @@ namespace IMS
         vector<unsigned> first_out;
         vector<unsigned> geo_distance; // meter
         vector<unsigned> default_travel_time; // seconds
-        vector<unsigned> default_speed; // m/s
         InversedGraph* inversed;
 
         // Density related
@@ -116,7 +115,6 @@ void serialize(Archive &archive, IMS::MapGraph &mapGraph, const unsigned int ver
     /* Edge Information */
     archive & mapGraph.default_travel_time;
     archive & mapGraph.geo_distance;
-    archive & mapGraph.default_speed;
 
     /* Density Information */
     archive & mapGraph.current_density;

@@ -81,21 +81,21 @@ partition_t * IMS::Partition::do_partition
     p->is_node = false;
     
     // Determine boundary nodes of the partition
-    for (unsigned current_node : nodes)
-    {
-        unsigned first_edge = graph->first_out[current_node];
-        unsigned last_edge = (current_node == graph->first_out.size() -1) ?
-                                    (graph->head.size() - 1) : graph->first_out[current_node + 1];
-
-        for (unsigned current_edge = first_edge; current_edge < last_edge; current_edge++)
-        {
-            if (find(nodes.begin(), nodes.end(), graph->head[current_edge]) == nodes.end())
-            {
-                p->boundary_nodes.push_back(current_node);
-                break;
-            }
-        }
-    }
+//    for (unsigned current_node : nodes)
+//    {
+//        unsigned first_edge = graph->first_out[current_node];
+//        unsigned last_edge = (current_node == graph->first_out.size() -1) ?
+//                                    (graph->head.size() - 1) : graph->first_out[current_node + 1];
+//
+//        for (unsigned current_edge = first_edge; current_edge < last_edge; current_edge++)
+//        {
+//            if (find(nodes.begin(), nodes.end(), graph->head[current_edge]) == nodes.end())
+//            {
+//                p->boundary_nodes.push_back(current_node);
+//                break;
+//            }
+//        }
+//    }
 
     if(l == 1)
     {
