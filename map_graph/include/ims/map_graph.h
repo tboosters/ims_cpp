@@ -30,6 +30,13 @@ namespace IMS
         vector<double[2]> nodes; // [[long, lat]]
     };
 
+    struct InversedGraph
+    {
+        vector<unsigned> head;
+        vector<unsigned> first_out;
+        map<unsigned, unsigned> relative_edge;
+    };
+
     class MapGraph
     {
     public:
@@ -43,6 +50,7 @@ namespace IMS
         vector<unsigned> geo_distance; // meter
         vector<unsigned> default_travel_time; // seconds
         vector<unsigned> default_speed; // m/s
+        InversedGraph* inversed;
 
         // Density related
         // current_density: vector id = edge ID, map key = critical change time, map value = density
@@ -68,7 +76,7 @@ namespace IMS
         void serialize(const string& output_file_path);
 
         /* Inverse */
-        MapGraph inverse();
+        InversedGraph* inverse();
 
         /* Pre-processing */
         void partition(const int &k, const int &l);
@@ -83,6 +91,7 @@ namespace IMS
 
         /* Util Functions */
         void print_graph();
+        void print_inversed_graph();
     };
 
 }

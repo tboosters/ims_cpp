@@ -52,6 +52,17 @@ int main()
     #endif
     mapGraph->initialize();
 
+    /* Graph tests */
+    cout << "==== Graph Test ====" << endl;
+    cout << "Original Graph:" << endl;
+    mapGraph->print_graph();
+    /*
+    cout << "Inversed Graph:" << endl;
+    mapGraph->inversed = mapGraph->inverse();
+    mapGraph->print_inversed_graph();
+    */
+    cout << endl;
+
     /* Partition + Layer tests */
     int k = 2;
     int l = 3;
