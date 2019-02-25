@@ -80,6 +80,9 @@ namespace IMS
 
         Path route(const double & origin_long, const double & origin_lat,
                 const double & dest_long, const double & dest_lat, const time_t & start_time);
+
+        /* Util Functions */
+        void print_graph();
     };
 
 }

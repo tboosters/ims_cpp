@@ -154,3 +154,23 @@ IMS::Path IMS::MapGraph::route(const double &origin_long, const double &origin_l
 {
     return IMS::Path();
 }
+
+/* Print graph structure
+ * Paramters: NIL
+ * Returns: when finish printing graph.
+ */
+void IMS::MapGraph::print_graph()
+{
+    for (unsigned node = 0; node < this->first_out.size(); node ++)
+    {
+        cout << "[" << node << "] -> ";
+        unsigned first_edge = this->first_out[node];
+        unsigned last_edge = (node == this->first_out.size() -1) ?
+                                    (this->head.size() - 1) : this->first_out[node + 1];
+        for (unsigned edge = first_edge; edge < last_edge; edge ++)
+        {
+            cout << this->head[edge] << ", ";
+        }
+        cout << endl;
+    }
+}
