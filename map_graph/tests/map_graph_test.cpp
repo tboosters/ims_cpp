@@ -77,15 +77,18 @@ int main()
 
     /* Partition + Layer tests */
     int k = 2;
-    int l = 3;
+    int l = 2;
 
+    cout << "==== Partition & Layer Test ====" << endl;
     IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph, k, l, 0);
     IMS::Partition::index_partition(p);
     auto layer = IMS::Partition::build_layer(p, lat.size());
 
+    cout << "Partition:" << endl;
     IMS::Partition::print_partition(p);
     cout << endl << endl;
 
+    cout << "Layer:" << endl;
     IMS::Partition::print_layer(layer);
     cout << endl << endl;
 

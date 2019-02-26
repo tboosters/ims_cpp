@@ -94,7 +94,7 @@ partition_t * IMS::Partition::do_partition
         unsigned last_edge = (node == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[node + 1];
         for (unsigned edge = first_edge; edge < last_edge; edge++)
         {
-            if (node_set.count(graph->head[edge]) > 0)
+            if (node_set.count(graph->head[edge]) == 0)
             {
                 p->boundary_outwards.push_back(node);
                 break;
@@ -108,7 +108,7 @@ partition_t * IMS::Partition::do_partition
         unsigned last_edge = (node == graph->inversed->first_out.size() -1) ? (graph->head.size()) : graph->inversed->first_out[node + 1];
         for (unsigned edge = first_edge; edge < last_edge; edge++)
         {
-            if (node_set.count(graph->inversed->head[edge]) > 0)
+            if (node_set.count(graph->inversed->head[edge]) == 0)
             {
                 p->boundary_inwards.push_back(node);
                 break;
@@ -263,11 +263,17 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
             // Do stuff with current node
             cout << curr->id << " ";
             cout << "(" << curr->sub_partition.size() << ") ";
-            cout << "(";
+            cout << "out(";
             for(int i = 0; i < curr->boundary_outwards.size(); i++)
             {
                 cout << curr->boundary_outwards[i];
                 cout << (i == curr->boundary_outwards.size()-1? "" : ", ");
+            }
+            cout << ") in(";
+            for(int i = 0; i < curr->boundary_inwards.size(); i++)
+            {
+                cout << curr->boundary_inwards[i];
+                cout << (i == curr->boundary_inwards.size()-1? "" : ", ");
             }
             cout << ") | ";
 
