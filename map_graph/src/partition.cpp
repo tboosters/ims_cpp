@@ -81,13 +81,13 @@ partition_t * IMS::Partition::do_partition
     p->id = partition_id;
     p->is_node = false;
     
-    //Determine boundary nodes of the partition
+    // Determine boundary nodes of the partition
     unordered_set<unsigned> node_set;
     for (unsigned node : nodes)
     {
         node_set.insert(node);
     }
-
+    // Finding outward boundaries
     for (unsigned node : nodes)
     {
         unsigned first_edge = graph->first_out[node];
@@ -97,6 +97,20 @@ partition_t * IMS::Partition::do_partition
             if (node_set.count(graph->head[edge]) > 0)
             {
                 p->boundary_outwards.push_back(node);
+                break;
+            }
+        }
+    }
+    // Finding inward boundaries
+    for (unsigned node : nodes)
+    {
+        unsigned first_edge = graph->inversed->first_out[node];
+        unsigned last_edge = (node == graph->inversed->first_out.size() -1) ? (graph->head.size()) : graph->inversed->first_out[node + 1];
+        for (unsigned edge = first_edge; edge < last_edge; edge++)
+        {
+            if (node_set.count(graph->inversed->head[edge]) > 0)
+            {
+                p->boundary_inwards.push_back(node);
                 break;
             }
         }
