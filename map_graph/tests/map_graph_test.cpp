@@ -1,15 +1,15 @@
 #include <iostream>
 
-#include "../include/ims/map_graph.h"
-#include "partition.h"
-#include "routing.h"
+#include "ims/map_graph.h"
+#include "../src/partition.h"
+#include "../src/routing.h"
 #include "map_graph_test_data.h"
 
 using namespace std;
 
 int main()
 {
-    /* Prepare test data */
+    /* Prepare tests data */
     #define N 9
     #define hand 9
     #define small 12
