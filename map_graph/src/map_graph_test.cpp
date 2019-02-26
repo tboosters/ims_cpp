@@ -10,7 +10,8 @@ using namespace std;
 int main()
 {
     /* Prepare test data */
-    #define N 12
+    #define N 9
+    #define hand 9
     #define small 12
     #define large 120
 
@@ -22,7 +23,12 @@ int main()
 
     vector<float> longi(N);
     vector<float> lat(N);
-    #if N == small
+    #if N == hand
+    for(int i = 0; i < N; i++) {
+        longi[i] = coordinates9[i][0];
+        lat[i] = coordinates9[i][1];
+    }
+    #elif N == small
     for(int i = 0; i < N; i++) {
         longi[i] = coordinates12[i][0];
         lat[i] = coordinates12[i][1];
@@ -39,7 +45,12 @@ int main()
     auto mapGraph = new IMS::MapGraph();
     mapGraph->latitude = lat;
     mapGraph->longitude = longi;
-    #if N == small
+    #if N == hand
+        mapGraph->first_out.assign(first_out9, first_out9 + N);
+        mapGraph->head.assign(head9, head9 + 14);
+        mapGraph->geo_distance.assign(geo_distance9, geo_distance9 + 14);
+        mapGraph->default_travel_time.assign(default_travel_time9, default_travel_time9 + 14);
+    #elif N == small
         mapGraph->first_out.assign(first_out12, first_out12 + N);
         mapGraph->head.assign(head12, head12 + N);
         mapGraph->geo_distance.assign(geo_distance12, geo_distance12 + N);
@@ -54,13 +65,14 @@ int main()
 
     /* Graph tests */
     cout << "==== Graph Test ====" << endl;
+
     cout << "Original Graph:" << endl;
     mapGraph->print_graph();
-    /*
+
     cout << "Inversed Graph:" << endl;
     mapGraph->inversed = mapGraph->inverse();
     mapGraph->print_inversed_graph();
-    */
+    
     cout << endl;
 
     /* Partition + Layer tests */

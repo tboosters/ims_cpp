@@ -48,16 +48,19 @@ void IMS::MapGraph::serialize(const string &output_file_path)
  */
 IMS::InversedGraph* IMS::MapGraph::inverse()
 {
-    InversedGraph* inverse;
+    auto inverse = new InversedGraph();
 
     // recalcuate inversed edges
     vector <vector <pair <unsigned, unsigned>>> temp_edges;
-    temp_edges.reserve(this->head.size());
+    for (unsigned int node = 0; node < this->first_out.size(); node ++)
+    {
+        vector< pair <unsigned, unsigned>> new_edge_container;
+        temp_edges.push_back(new_edge_container);
+    }
     for (unsigned int current_node = 0; current_node < this->first_out.size(); current_node++)
     {
         unsigned first_edge = this->first_out[current_node];
-        unsigned last_edge = (current_node == this->first_out.size() -1) ?
-                                    (this->head.size() - 1) : this->first_out[current_node + 1];
+        unsigned last_edge = (current_node == this->first_out.size() -1) ? (this->head.size()) : this->first_out[current_node + 1];
         for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
         {
             temp_edges[this->head[current_edge]].push_back(pair <unsigned, unsigned> (current_edge, current_node));
@@ -68,17 +71,16 @@ IMS::InversedGraph* IMS::MapGraph::inverse()
     inverse->head.reserve(this->head.size());
     inverse->first_out.reserve(this->first_out.size());
     unsigned current_head_position = 0;
-    for (unsigned int new_origin; new_origin < temp_edges.size(); new_origin ++)
+    for (unsigned int new_origin = 0; new_origin < temp_edges.size(); new_origin ++)
     {
-        inverse->first_out[new_origin] = current_head_position;
-        for (unsigned int new_edge; new_edge < temp_edges[new_origin].size(); new_edge ++)
+        inverse->first_out.push_back(current_head_position);
+        for (unsigned int new_edge = 0; new_edge < temp_edges[new_origin].size(); new_edge ++)
         {
-            inverse->head[current_head_position] = temp_edges[new_origin][new_edge].second;
+            inverse->head.push_back(temp_edges[new_origin][new_edge].second);
             inverse->relative_edge[current_head_position] = temp_edges[new_origin][new_edge].first;
             current_head_position ++;
         }
     }
-
     return inverse;
 }
 
@@ -153,7 +155,7 @@ void IMS::MapGraph::print_graph()
     {
         cout << "[" << node << "] -> ";
         unsigned first_edge = this->first_out[node];
-        unsigned last_edge = (node == this->first_out.size() -1) ? (this->head.size() - 1) : this->first_out[node + 1];
+        unsigned last_edge = (node == this->first_out.size() -1) ? (this->head.size()) : this->first_out[node + 1];
         for (unsigned edge = first_edge; edge < last_edge; edge ++)
         {
             cout << this->head[edge] << ", ";
@@ -172,7 +174,7 @@ void IMS::MapGraph::print_inversed_graph()
     {
         cout << "[" << node << "] -> ";
         unsigned first_edge = this->inversed->first_out[node];
-        unsigned last_edge = (node == this->inversed->first_out.size() -1) ? (this->inversed->head.size() - 1) : this->inversed->first_out[node + 1];
+        unsigned last_edge = (node == this->inversed->first_out.size() -1) ? (this->inversed->head.size()) : this->inversed->first_out[node + 1];
         for (unsigned edge = first_edge; edge < last_edge; edge ++)
         {
             cout << this->inversed->head[edge] << ", ";

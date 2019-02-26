@@ -84,8 +84,7 @@ partition_t * IMS::Partition::do_partition
 //    for (unsigned current_node : nodes)
 //    {
 //        unsigned first_edge = graph->first_out[current_node];
-//        unsigned last_edge = (current_node == graph->first_out.size() -1) ?
-//                                    (graph->head.size() - 1) : graph->first_out[current_node + 1];
+//        unsigned last_edge = (current_node == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[current_node + 1];
 //
 //        for (unsigned current_edge = first_edge; current_edge < last_edge; current_edge++)
 //        {
