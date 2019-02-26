@@ -28,7 +28,8 @@ struct partition_t
 {
     unsigned id;
     bool is_node;
-    vector<unsigned> boundary_nodes;
+    vector<unsigned> boundary_outwards;
+    vector<unsigned> boundary_inwards;
     vector<partition_t*> sub_partition;
 };
 typedef struct partition_t partition_t;

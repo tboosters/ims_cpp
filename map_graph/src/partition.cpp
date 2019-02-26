@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cmath>
 #include <queue>
+#include <unordered_set>
 
 #include "partition.h"
 
@@ -80,21 +81,26 @@ partition_t * IMS::Partition::do_partition
     p->id = partition_id;
     p->is_node = false;
     
-    // Determine boundary nodes of the partition
-//    for (unsigned current_node : nodes)
-//    {
-//        unsigned first_edge = graph->first_out[current_node];
-//        unsigned last_edge = (current_node == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[current_node + 1];
-//
-//        for (unsigned current_edge = first_edge; current_edge < last_edge; current_edge++)
-//        {
-//            if (find(nodes.begin(), nodes.end(), graph->head[current_edge]) == nodes.end())
-//            {
-//                p->boundary_nodes.push_back(current_node);
-//                break;
-//            }
-//        }
-//    }
+    //Determine boundary nodes of the partition
+    unordered_set<unsigned> node_set;
+    for (unsigned node : nodes)
+    {
+        node_set.insert(node);
+    }
+
+    for (unsigned node : nodes)
+    {
+        unsigned first_edge = graph->first_out[node];
+        unsigned last_edge = (node == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[node + 1];
+        for (unsigned edge = first_edge; edge < last_edge; edge++)
+        {
+            if (node_set.count(graph->head[edge]) > 0)
+            {
+                p->boundary_outwards.push_back(node);
+                break;
+            }
+        }
+    }
 
     if(l == 1)
     {
@@ -244,10 +250,10 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
             cout << curr->id << " ";
             cout << "(" << curr->sub_partition.size() << ") ";
             cout << "(";
-            for(int i = 0; i < curr->boundary_nodes.size(); i++)
+            for(int i = 0; i < curr->boundary_outwards.size(); i++)
             {
-                cout << curr->boundary_nodes[i];
-                cout << (i == curr->boundary_nodes.size()-1? "" : ", ");
+                cout << curr->boundary_outwards[i];
+                cout << (i == curr->boundary_outwards.size()-1? "" : ", ");
             }
             cout << ") | ";
 
