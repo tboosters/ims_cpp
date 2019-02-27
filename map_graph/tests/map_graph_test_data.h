@@ -1,3 +1,9 @@
+float coordinates4[4][2] = {{0, 0},
+                            {1, 0},
+                            {0, 1},
+                            {1, 1}
+};
+
 float coordinates9[9][2] = {{114.00f, 22.20f},
                             {114.01f, 22.21f},
                             {114.02f, 22.22f},
@@ -142,6 +148,12 @@ float coordinates120 [120][2] = {{114.181f, 22.3461f},
                                  {114.233f, 22.2709f},
                                  {114.233f, 22.271f},
                                  {114.233f, 22.271f},
+};
+
+unsigned first_out4[4] = {0,
+                          2,
+                          2,
+                          3
 };
 
 unsigned first_out9[9] = {0,
@@ -289,6 +301,13 @@ unsigned first_out120[120] = {0,
                               220,
                               222,
                               225,
+};
+
+unsigned head4[5] = {2,
+                     1,
+                     3,
+                     1,
+                     0
 };
 
 unsigned head9[14] = {1,
@@ -568,6 +587,13 @@ unsigned head120[230] = {22455,
                          447,
 };
 
+unsigned default_travel_time4[5] = {10,
+                                    20,
+                                    30,
+                                    40,
+                                    50
+};
+
 unsigned default_travel_time9[14] = {100,
                                      100,
                                      100,
@@ -842,6 +868,13 @@ unsigned default_travel_time120[230] = {72720,
                                         1605600,
                                         1008000,
                                         1270800,
+};
+
+unsigned geo_distance4[5] = {138,
+                             276,
+                             414,
+                             552,
+                             690
 };
 
 unsigned geo_distance9[14] = {10,

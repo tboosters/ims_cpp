@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "ims/map_graph.h"
 #include "../src/partition.h"
@@ -10,7 +11,8 @@ using namespace std;
 int main()
 {
     /* Prepare tests data */
-    #define N 9
+    #define N 4
+    #define square 4
     #define hand 9
     #define small 12
     #define large 120
@@ -23,7 +25,12 @@ int main()
 
     vector<float> longi(N);
     vector<float> lat(N);
-    #if N == hand
+    #if N == square
+    for(int i = 0; i < N; i++) {
+        longi[i] = coordinates4[i][0];
+        lat[i] = coordinates4[i][1];
+    }
+    #elif N == hand
     for(int i = 0; i < N; i++) {
         longi[i] = coordinates9[i][0];
         lat[i] = coordinates9[i][1];
@@ -45,7 +52,12 @@ int main()
     auto mapGraph = new IMS::MapGraph();
     mapGraph->latitude = lat;
     mapGraph->longitude = longi;
-    #if N == hand
+    #if N == square
+        mapGraph->first_out.assign(first_out4, first_out4 + N);
+        mapGraph->head.assign(head4, head4 + 5);
+        mapGraph->geo_distance.assign(geo_distance4, geo_distance4 + 5);
+        mapGraph->default_travel_time.assign(default_travel_time4, default_travel_time4 + 5);
+    #elif N == hand
         mapGraph->first_out.assign(first_out9, first_out9 + N);
         mapGraph->head.assign(head9, head9 + 14);
         mapGraph->geo_distance.assign(geo_distance9, geo_distance9 + 14);
@@ -112,5 +124,13 @@ int main()
     assert(IMS::Routing::retrieve_weight(mapGraph, 1, 99) == mapGraph->default_travel_time[1]);
     assert(IMS::Routing::retrieve_weight(mapGraph, 1, 100) == 2 * (mapGraph->default_travel_time[1]));
 
+    /* Find nearest edge with location tests, longi = x, lat = y */
+    unsigned not_found = INFINITY;
+    assert(mapGraph->find_nearest_edge_of_location(0.5, 0, 0) == 0);
+    assert(mapGraph->find_nearest_edge_of_location(0.5, -0.5, 0) == not_found);
+    assert(mapGraph->find_nearest_edge_of_location(0.5, -0.5, 0.5) == 0);
+    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0) == not_found);
+    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0.2) == 4);
+    assert(mapGraph->find_nearest_edge_of_location(0, 0, 0) == 0);
     return 0;
 }

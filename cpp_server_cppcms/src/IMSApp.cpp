@@ -8,14 +8,18 @@
 #include <cppcms/http_request.h>
 #include <cppcms/http_response.h>
 #include <sstream>
+#include <cstdlib>
 
 #include "utils.h"
 #include "IMSApp.h"
 #include "ims/map_graph.h"
+#include "ims/incident_manager.h"
+
 
 using namespace std;
 using namespace IMS;
 
+// Util function for handling JSON
 cppcms::json::value extract_json_data(pair<void *,size_t> raw_post_data) throw (booster::invalid_argument)
 {
     cppcms::json::value json_data;
@@ -37,9 +41,10 @@ cppcms::json::value extract_json_data(pair<void *,size_t> raw_post_data) throw (
     return json_data;
 }
 
-IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph) : cppcms::application(srv)
+IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentManager *incident_manager) : cppcms::application(srv)
 {
     this->map_graph = map_graph;
+    this->incident_manager = incident_manager;
 
     // Dev url for checking graph
     dispatcher().map("GET", "/graph", &IMSApp::check_graph, this);
@@ -47,6 +52,7 @@ IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph) : cppcms::applica
     // Add url dispatchers
     dispatcher().map("POST", "/route", &IMSApp::route, this);
     dispatcher().map("POST", "/incident", &IMSApp::inject_incident, this);
+    dispatcher().map("DELETE", "/incident", &IMSApp::remove_incident, this);
     dispatcher().map("POST", "/update_graph", &IMSApp::handle_graph_update, this);
 }
 
@@ -71,13 +77,28 @@ void IMSApp::route()
         return;
     }
 
+    double origin_long = json_data["coordinates"][0][0].number();
+    double origin_lat = json_data["coordinates"][0][1].number();
+    double destination_long = json_data["coordinates"][1][0].number();
+    double destination_lat = json_data["coordinates"][1][1].number();
 
-    double origin_long = json_data["origin"][0].number();
-    double origin_lat = json_data["origin"][1].number();
-    double destination_long = json_data["destination"][0].number();
-    double destination_lat = json_data["destination"][1].number();
+    /* Reverse Geocoding for origin and destination */
+    unsigned origin =
+            map_graph->map_geo_position.find_nearest_neighbor_within_radius(origin_lat, origin_long, 500).id;
+    unsigned destination =
+            map_graph->map_geo_position.find_nearest_neighbor_within_radius(destination_lat, destination_long, 500).id;
+    if(origin == RoutingKit::invalid_id)
+    {
+        response().make_error_response(404, "No node within 500m from origin position.");
+        return;
+    }
+    if(destination == RoutingKit::invalid_id)
+    {
+        response().make_error_response(404, "No node within 500m from destination position.");
+        return;
+    }
 
-    printf("%f, %f\n%f, %f\n", origin_long, origin_lat, destination_long, destination_lat);
+    printf("%f, %f\n%f, %f\n%d, %d", origin_long, origin_lat, destination_long, destination_lat, origin, destination);
 
     /* Load sample_route.json */
     ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
@@ -99,9 +120,69 @@ void IMSApp::route()
 
 void IMSApp::inject_incident()
 {
-    response().out() << "inject_incident";
+    /* Take POST JSON body */
+    cppcms::json::value json_data;
+    try
+    {
+        json_data = extract_json_data(request().raw_post_data());
+    }
+    catch (booster::invalid_argument & e)
+    {
+        response().make_error_response(400, e.what());
+        return;
+    }
+
+    double incident_long = json_data["location"][0].number();
+    double incident_lat = json_data["location"][1].number();
+    unsigned impact = (unsigned) json_data["impact"].number();
+
+    /* Reverse Geocoding for affected edge */
+    unsigned affected_edge = map_graph->find_nearest_edge_of_location(incident_lat, incident_long, 0.01);
+    if(affected_edge == (unsigned) INFINITY)
+    {
+        response().make_error_response(404, "Incident location not on any road");
+        return;
+    }
+
+    unsigned incident_id = incident_manager->add_incident(affected_edge, impact);
+
+    /* Write route to response */
+    cppcms::json::value response_body;
+    response_body["data"] = incident_id;
+    response().out() << response_body;
 }
 
+void IMSApp::remove_incident()
+{
+    /* Take URL parameter */
+    string get_param = request().get("incident");
+    if(get_param.empty())
+    {
+        response().make_error_response(400, "Empty incident ID");
+        return;
+    }
+
+    unsigned incident_id;
+    try
+    {
+        incident_id = stoi(get_param);
+    }
+    catch(exception e)
+    {
+        response().make_error_response(400, "Non-numerical parameter");
+        return;
+    }
+
+    unsigned num_of_incident_removed = incident_manager->remove_incident(incident_id);
+    if(num_of_incident_removed == 0)
+    {
+        response().make_error_response(404, "Incident not found");
+        return;
+    }
+
+    response().status(200);
+
+}
 
 void IMSApp::handle_graph_update()
 {

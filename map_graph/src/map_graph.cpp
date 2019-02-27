@@ -11,13 +11,15 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
+#include <routingkit/geo_position_to_node.h>
 
 #include "../include/ims/map_graph.h"
 #include "partition.h"
 
 using namespace std;
 
-/* Initialize dynamic fields: default_speed, current_density
+/* Initialize dynamic fields: current_density, inversed
+ * MUST BE CALLED AFTER CREATING CLASS INSTANCE.
  * Parameter: NIL
  * Return: when the fields are initialized
  * */
@@ -28,6 +30,10 @@ void IMS::MapGraph::initialize()
         current_density.emplace_back();
         current_density[i][0] = 0;
     }
+
+    inversed = inverse();
+
+    map_geo_position = RoutingKit::GeoPositionToNode(latitude, longitude);
 }
 
 /** Serialize MapGraph information into persistent file
@@ -41,6 +47,7 @@ void IMS::MapGraph::serialize(const string &output_file_path)
     output_archive_stream << *this;
     ofs.close();
 }
+
 
 /** Creates an inversed MapGraph for the current graph that contains edges pointing to the opposite side
  * Parameter: NIL
@@ -98,6 +105,7 @@ void IMS::MapGraph::partition(const int &k, const int &l)
     for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
 
     IMS::Partition::partition_t * partition = IMS::Partition::do_partition(nodes, this, k, l, 0);
+    IMS::Partition::index_partition(partition);
     IMS::Partition::layer_t layer = IMS::Partition::build_layer(partition, latitude.size());
     IMS::Partition::print_layer(layer);
 }
@@ -144,6 +152,70 @@ IMS::Path IMS::MapGraph::route(const double &origin_long, const double &origin_l
 {
     return IMS::Path();
 }
+
+/* Incident Managemet */
+
+/* Determine if point q is in range / linear with line formed by points p1 and p2
+ * Parameters: const float & p1_x
+ *             const float & p1_y
+ *             const float & p2_x
+ *             const float & p2_y
+ *             const float & q_x
+ *             const float & q_y
+ *             const float & offset: offset applied to x and y axis to tolerate q's coordinate
+ * Returns: bool: whether q is within the range of the line p1p2
+ */
+bool is_in_line_range(const float &p1_x, const float &p1_y, const float &p2_x, const float &p2_y, const float &q_x,
+                      const float &q_y, const float &offset)
+{
+    if(q_x >= min(p1_x, p2_x)-offset && q_x <= max(p1_x, p2_x)+offset
+       && q_y >= min(p1_y, p2_y)-offset && q_y <= max(p1_y, p2_y)+offset)
+    {
+        if(p2_x == p1_x || p2_y == p1_y)
+        {
+            // vertical line or horizontal line
+            return true;
+        }
+
+        // y = mx + c
+        double m = (p2_y - p1_y) / (p2_x - p1_x);
+        double c = m * (-p1_x) + p1_y;
+
+        if(m*q_x+c >= q_y-offset && m*q_x+c <= q_y+offset)
+        {
+           return true;
+        }
+        if((q_y-c)/m >= q_x-offset && (q_y-c)/m <= q_x+offset)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Find which edge this location is on or the nearest edge.
+ * Parameters: const float & lat
+ *             const float & longi
+ *             const float & offset: offset applied to x and y axis to tolerate q's coordinate
+ * Returns: unsigned: nearest edge id, INFINITY if not found
+ */
+unsigned IMS::MapGraph::find_nearest_edge_of_location(const float &lat, const float &longi, const float &offset)
+{
+    for(unsigned tail = 0; tail < first_out.size(); tail++)
+    {
+        for(unsigned edge = first_out[tail]; edge < first_out[tail+1] || (tail+1 == first_out.size() && edge < head.size()); edge++)
+        {
+            if(is_in_line_range(longitude[tail], latitude[tail], longitude[head[edge]], latitude[head[edge]], longi, lat, offset))
+            {
+                return edge;
+            }
+        }
+    }
+
+    return INFINITY;
+}
+
+/* Utils */
 
 /* Print graph structure
  * Paramters: NIL

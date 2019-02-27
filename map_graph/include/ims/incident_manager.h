@@ -13,12 +13,12 @@ class IncidentManager
 {
 private:
     unsigned num_of_incident = 0;
-    unordered_map<unsigned, double> incidents;
+    unordered_map<unsigned, unsigned> incidents;
     unordered_map<unsigned, unordered_set<unsigned> > affected_roads;
 
 public:
-    unsigned add_incident(unsigned edge_id, double impact);
-    void remove_incident(unsigned incident_id);
+    unsigned add_incident(unsigned edge_id, unsigned impact);
+    unsigned remove_incident(unsigned incident_id);
     double get_total_incident_effect(unsigned edge_id);
 };
 

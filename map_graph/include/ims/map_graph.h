@@ -17,6 +17,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
+#include <routingkit/geo_position_to_node.h>
 
 using namespace std;
 
@@ -41,7 +42,6 @@ namespace IMS
     {
     public:
         /* TODO: Add preprocessed data - layers, distance matrix */
-        /* TODO: Add Incident Management */
 
         vector<float> latitude;
         vector<float> longitude;
@@ -50,6 +50,7 @@ namespace IMS
         vector<unsigned> geo_distance; // meter
         vector<unsigned> default_travel_time; // seconds
         InversedGraph* inversed;
+        RoutingKit::GeoPositionToNode map_geo_position; // Reversed geocoding index
 
         // Density related
         // current_density: vector id = edge ID, map key = critical change time, map value = density
@@ -61,12 +62,12 @@ namespace IMS
         void initialize();
 
         /* Initialize from deserialization */
-        static MapGraph deserialize(const string& input_file_path)
+        static MapGraph * deserialize(const string& input_file_path)
         {
-            MapGraph graph;
+            auto graph = new MapGraph();
             ifstream ifs(input_file_path);
             boost::archive::text_iarchive input_archive_stream(ifs);
-            input_archive_stream >> graph;
+            input_archive_stream >> *graph;
             ifs.close();
             return graph;
         }
@@ -87,6 +88,9 @@ namespace IMS
 
         Path route(const double & origin_long, const double & origin_lat,
                 const double & dest_long, const double & dest_lat, const time_t & start_time);
+
+        /* Incident Management */
+        unsigned find_nearest_edge_of_location(const float &lat, const float &longi, const float &offset);
 
         /* Util Functions */
         void print_graph();

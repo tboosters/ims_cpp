@@ -41,9 +41,12 @@ int main(int argc, char ** argv)
     try
     {
         cout << "Initializing MapGraph..." << endl;
-        IMS::MapGraph map_graph = IMS::MapGraph::deserialize(map_file_path);
+        auto map_graph = IMS::MapGraph::deserialize(map_file_path);
+        map_graph->initialize();
+        auto incident_manager = new IMS::IncidentManager();
+
         cppcms::service srv(argc, argv);
-        srv.applications_pool().mount(cppcms::applications_factory<IMS::IMSApp>(&map_graph));
+        srv.applications_pool().mount(cppcms::applications_factory<IMS::IMSApp>(map_graph, incident_manager));
         cout << "Server starting at 8080..." << endl;
         srv.run();
     }

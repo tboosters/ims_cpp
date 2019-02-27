@@ -1,7 +1,7 @@
 #include <iostream>
 #include <assert.h>
 
-#include "../src/incident_manager.h"
+#include "../include/ims/incident_manager.h"
 
 using namespace std;
 
