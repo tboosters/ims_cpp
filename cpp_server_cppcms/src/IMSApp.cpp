@@ -137,7 +137,9 @@ void IMSApp::inject_incident()
     unsigned impact = (unsigned) json_data["impact"].number();
 
     /* Reverse Geocoding for affected edge */
-    unsigned affected_edge = map_graph->find_nearest_edge_of_location(incident_lat, incident_long, 0.01);
+    /* OFFSET OF NEAREST_EDGE = 0.002 for accuracy of result */
+    const float offset = 0.002;
+    unsigned affected_edge = map_graph->find_nearest_edge_of_location(incident_long, incident_lat, offset);
     if(affected_edge == (unsigned) INFINITY)
     {
         response().make_error_response(404, "Incident location not on any road");

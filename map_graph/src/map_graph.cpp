@@ -199,7 +199,7 @@ bool is_in_line_range(const float &p1_x, const float &p1_y, const float &p2_x, c
  *             const float & offset: offset applied to x and y axis to tolerate q's coordinate
  * Returns: unsigned: nearest edge id, INFINITY if not found
  */
-unsigned IMS::MapGraph::find_nearest_edge_of_location(const float &lat, const float &longi, const float &offset)
+unsigned IMS::MapGraph::find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset)
 {
     for(unsigned tail = 0; tail < first_out.size(); tail++)
     {
@@ -207,6 +207,7 @@ unsigned IMS::MapGraph::find_nearest_edge_of_location(const float &lat, const fl
         {
             if(is_in_line_range(longitude[tail], latitude[tail], longitude[head[edge]], latitude[head[edge]], longi, lat, offset))
             {
+                printf("%f %f %f %f\n", latitude[tail], longitude[tail], latitude[head[edge]], longitude[head[edge]]);
                 return edge;
             }
         }
