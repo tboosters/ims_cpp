@@ -1,3 +1,11 @@
+/*
+ * Manages incident information including IDs, impact and affected roads.
+ * Provides adding, removing and retrieval operations.
+ * Libraries:
+ * Version: 1.0
+ * Author: Terence Chow
+ */
+
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -6,7 +14,14 @@
 
 using namespace std;
 
-unsigned IMS::IncidentManager::add_incident(unsigned edge_id, unsigned int impact)
+/* Stores incident with impact. Assign it with an ID and stores ID associated with edge.
+ * Number of incident is incremented.
+ *
+ * Parameter(s): unsigned edge_id
+ *               unsigned impact
+ * Returns: unsigned: incident ID
+ */
+unsigned IMS::IncidentManager::add_incident(unsigned edge_id, unsigned impact)
 {
     unsigned incident_id = num_of_incident;
     incidents[incident_id] = impact;
@@ -15,6 +30,12 @@ unsigned IMS::IncidentManager::add_incident(unsigned edge_id, unsigned int impac
     return incident_id;
 }
 
+/* Removes incident. Finds all roads affected by this incident and remove entries.
+ * Removes also the affected road entry if the entry is empty.
+ *
+ * Parameter(s): unsigned incident_id
+ * Returns: unsigned: number of incident removed -> 0 indicates incident ID not found
+ */
 unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
 {
     unsigned num_of_incidents_removed = incidents.erase(incident_id);
@@ -40,12 +61,16 @@ unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
     return num_of_incidents_removed;
 }
 
-double IMS::IncidentManager::get_total_incident_effect(unsigned edge_id)
+/* Calculate total impact brought by incidents on the edge specified.
+ * Parameter(s): unsigned edge_id
+ * Returns: double: total incident impact
+ */
+double IMS::IncidentManager::get_total_incident_impact(unsigned edge_id)
 {
-    double total_incident_effect = 0;
+    double total_incident_impact = 0;
     for(auto & incident : affected_roads[edge_id])
     {
-        total_incident_effect += incidents[incident];
+        total_incident_impact += incidents[incident];
     }
-    return total_incident_effect;
+    return total_incident_impact;
 }

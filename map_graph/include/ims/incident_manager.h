@@ -1,3 +1,10 @@
+/*
+ * Header file for IncidentManager
+ * Libraries:
+ * Version: 1.0
+ * Author: Terence Chow
+ */
+
 #ifndef IMS_CPP_INCIDENTS_H
 #define IMS_CPP_INCIDENTS_H
 
@@ -19,7 +26,7 @@ private:
 public:
     unsigned add_incident(unsigned edge_id, unsigned impact);
     unsigned remove_incident(unsigned incident_id);
-    double get_total_incident_effect(unsigned edge_id);
+    double get_total_incident_impact(unsigned edge_id);
 };
 
 }

@@ -15,10 +15,10 @@ int main()
 
     /* Test can add to affected_roads */
     double expected = 2.1 + 4.2;  // Calculate expected value here to avoid float point problem (6.3 != 6.3).
-    assert(incidentManager->get_total_incident_effect(42) == expected);
+    assert(incidentManager->get_total_incident_impact(42) == expected);
 
     /* Test can remove incident */
     incidentManager->remove_incident(1);
-    assert(incidentManager->get_total_incident_effect(42) == 2.1);
+    assert(incidentManager->get_total_incident_impact(42) == 2.1);
 }
 
