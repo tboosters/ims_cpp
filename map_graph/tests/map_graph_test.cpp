@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 #include "ims/map_graph.h"
 #include "../src/partition.h"
@@ -125,12 +126,17 @@ int main()
     assert(IMS::Routing::retrieve_weight(mapGraph, 1, 100) == 2 * (mapGraph->default_travel_time[1]));
 
     /* Find nearest edge with location tests, longi = x, lat = y */
-    unsigned not_found = INFINITY;
-    assert(mapGraph->find_nearest_edge_of_location(0.5, 0, 0) == 0);
-    assert(mapGraph->find_nearest_edge_of_location(0.5, -0.5, 0) == not_found);
-    assert(mapGraph->find_nearest_edge_of_location(0.5, -0.5, 0.5) == 0);
-    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0) == not_found);
-    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0.2) == 4);
-    assert(mapGraph->find_nearest_edge_of_location(0, 0, 0) == 0);
+    assert(mapGraph->find_nearest_edge_of_location(0, 0.5, 0)[0] == 0);
+    assert(mapGraph->find_nearest_edge_of_location(-0.5, 0.5, 0).empty());
+    assert(mapGraph->find_nearest_edge_of_location(-0.5, 0.5, 0.5)[0] == 0);
+    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0).empty());
+    assert(mapGraph->find_nearest_edge_of_location(0.5, 0.7, 0.2)[0] == 4);
+    assert(mapGraph->find_nearest_edge_of_location(0, 0, 0)[0] == 0);
+    /* Test for multiple affected edges */
+    vector<unsigned> affected_edges = mapGraph->find_nearest_edge_of_location(0.1, 0.1, 0.1);
+    assert(affected_edges.size() == 3);
+    assert(find(affected_edges.begin(), affected_edges.end(), 0) != affected_edges.end());
+    assert(find(affected_edges.begin(), affected_edges.end(), 1) != affected_edges.end());
+    assert(find(affected_edges.begin(), affected_edges.end(), 4) != affected_edges.end());
     return 0;
 }

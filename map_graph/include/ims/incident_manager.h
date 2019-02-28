@@ -24,7 +24,7 @@ private:
     unordered_map<unsigned, unordered_set<unsigned> > affected_roads;
 
 public:
-    unsigned add_incident(unsigned edge_id, unsigned impact);
+    unsigned add_incident(vector<unsigned> affected_edges, unsigned impact);
     unsigned remove_incident(unsigned incident_id);
     double get_total_incident_impact(unsigned edge_id);
 };

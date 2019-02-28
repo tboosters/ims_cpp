@@ -90,7 +90,7 @@ namespace IMS
                 const double & dest_long, const double & dest_lat, const time_t & start_time);
 
         /* Incident Management */
-        unsigned find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset);
+        vector<unsigned int> find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset);
 
         /* Util Functions */
         void print_graph();

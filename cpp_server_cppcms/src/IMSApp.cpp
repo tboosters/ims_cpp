@@ -139,14 +139,14 @@ void IMSApp::inject_incident()
     /* Reverse Geocoding for affected edge */
     /* OFFSET OF NEAREST_EDGE = 0.002 for accuracy of result */
     const float offset = 0.002;
-    unsigned affected_edge = map_graph->find_nearest_edge_of_location(incident_long, incident_lat, offset);
-    if(affected_edge == (unsigned) INFINITY)
+    vector<unsigned> affected_edges = map_graph->find_nearest_edge_of_location(incident_long, incident_lat, offset);
+    if(affected_edges.empty())
     {
         response().make_error_response(404, "Incident location not on any road");
         return;
     }
 
-    unsigned incident_id = incident_manager->add_incident(affected_edge, impact);
+    unsigned incident_id = incident_manager->add_incident(affected_edges, impact);
 
     /* Write route to response */
     cppcms::json::value response_body;

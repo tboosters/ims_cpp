@@ -14,18 +14,21 @@
 
 using namespace std;
 
-/* Stores incident with impact. Assign it with an ID and stores ID associated with edge.
+/* Stores incident with impact. Assign it with an ID and stores ID associated with edges.
  * Number of incident is incremented.
  *
- * Parameter(s): unsigned edge_id
+ * Parameter(s): vector<unsigned> edge_id
  *               unsigned impact
  * Returns: unsigned: incident ID
  */
-unsigned IMS::IncidentManager::add_incident(unsigned edge_id, unsigned impact)
+unsigned IMS::IncidentManager::add_incident(vector<unsigned> affected_edges, unsigned impact)
 {
     unsigned incident_id = num_of_incident;
     incidents[incident_id] = impact;
-    affected_roads[edge_id].insert(incident_id);
+    for(auto & edge : affected_edges)
+    {
+        affected_roads[edge].insert(incident_id);
+    }
     num_of_incident++;
     return incident_id;
 }

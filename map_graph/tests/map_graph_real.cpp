@@ -26,7 +26,12 @@ int main()
     while(1)
     {
         float lat, longi, offset;
-        cin >> lat >> longi >> offset;
-        cout << graph->find_nearest_edge_of_location(lat, longi, offset) << endl;
+        cin >> longi >> lat >> offset;
+        vector<unsigned> affected_edges = graph->find_nearest_edge_of_location(longi, lat, offset);
+        for(auto & edge : affected_edges)
+        {
+            cout << edge << " ";
+        }
+        cout << endl;
     }
 }
