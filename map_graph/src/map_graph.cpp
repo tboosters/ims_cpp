@@ -15,6 +15,7 @@
 
 #include "../include/ims/map_graph.h"
 #include "partition.h"
+#include "preprocess.h"
 
 using namespace std;
 

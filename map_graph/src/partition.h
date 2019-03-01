@@ -21,7 +21,8 @@ namespace Partition
 /* Stores a partition:
  * Fields: unsigned id: partition / node id
  *         bool is_node
- *         vector<unsigned> boundary_nodes
+ *         vector<unsigned> boundary_outwards: list of nodes with outward edges
+ *         vector<unsigned> boundary_inwards: list of nodes with inward edges
  *         vector<partition_t*> sub_partition: list of pointers to all children
  */
 struct partition_t
