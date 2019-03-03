@@ -23,6 +23,7 @@ namespace Partition
  *         bool is_node
  *         vector<unsigned> boundary_outwards: list of nodes with outward edges
  *         vector<unsigned> boundary_inwards: list of nodes with inward edges
+ *         partition_t* parent partition: pointer to parent
  *         vector<partition_t*> sub_partition: list of pointers to all children
  */
 struct partition_t
@@ -31,6 +32,7 @@ struct partition_t
     bool is_node;
     vector<unsigned> boundary_outwards;
     vector<unsigned> boundary_inwards;
+    partition_t* parent_partition;
     vector<partition_t*> sub_partition;
 };
 typedef struct partition_t partition_t;

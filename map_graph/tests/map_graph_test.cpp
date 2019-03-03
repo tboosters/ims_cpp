@@ -12,7 +12,7 @@ using namespace std;
 int main()
 {
     /* Prepare tests data */
-    #define N 4
+    #define N 9
     #define square 4
     #define hand 9
     #define small 12
@@ -90,7 +90,7 @@ int main()
 
     /* Partition + Layer tests */
     int k = 2;
-    int l = 2;
+    int l = 3;
 
     cout << "==== Partition & Layer Test ====" << endl;
     IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph, k, l, 0);

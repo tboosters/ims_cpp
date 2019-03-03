@@ -80,6 +80,7 @@ partition_t * IMS::Partition::do_partition
     auto p = new IMS::Partition::partition_t();
     p->id = partition_id;
     p->is_node = false;
+    p->parent_partition = NULL;
     
     // Determine boundary nodes of the partition
     unordered_set<unsigned> node_set;
@@ -135,6 +136,7 @@ partition_t * IMS::Partition::do_partition
     long next_pid = 0;
     for (auto & sub_partition : sub_partitions) {
         partition_t * sp = do_partition(sub_partition.second, graph, k, l - 1, next_pid);
+        sp->parent_partition = p;
 
         p->sub_partition.push_back(sp);
         next_pid++;

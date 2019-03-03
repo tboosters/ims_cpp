@@ -19,18 +19,24 @@ namespace Preprocess
 {
 
 /* Stores an entry of a distane table
- * Fields: vector<unsigned> partition_distance: list of distances to each node within the same layer
+ * Fields: map<unsigned, unsigned> partition_distance: list of distances to each node within the same layer. 
+ *                                           e.g. partition_distance[n] = distane towards n
  *         unsigned outbound_distance: distance towards the edge of the layer
  *         unsigned inbound_distance: distance from the edge of the layer
  */
 struct entry_t
 {
-    vector<unsigned> partition_distance;
+    map<unsigned, unsigned> partition_distance;
     unsigned outbound_distance;
     unsigned inbound_distance;
 };
 typedef struct entry_t entry_t;
-typedef vector< vector< vector<entry_t>>> distance_table_t;
+
+/* Records the entirety of the distance table
+ * e.g. distance_table[x][y] = distance information of node / partition y in level x
+ * e.g. distance_table[x][y].partition_distance[z] = precomputed distane of node / partition y to z in level x
+ */
+typedef vector< vector< entry_t>> distance_table_t;
 
 // Preprocessing
 distance_table_t* do_preprocess (const vector<unsigned> &nodes, 
