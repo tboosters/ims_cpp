@@ -8,6 +8,7 @@ using namespace std;
 
 int main()
 {
+    cout << "==== Incident Manager Test ====" << endl;
     auto incidentManager = new IMS::IncidentManager();
 
     /* Test can increment num_of_incident and return incident ID */
@@ -27,5 +28,7 @@ int main()
     /* Test can remove incident */
     incidentManager->remove_incident(1);
     assert(incidentManager->get_total_incident_impact(42) == 2);
+
+    cout << "==== All Incident Manager Tests passed ====" << endl;
 }
 
