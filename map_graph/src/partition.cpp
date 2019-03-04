@@ -264,6 +264,11 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
 
             // Do stuff with current node
             cout << curr->id << " ";
+            //cout << "[" << curr->id << " @ " << curr->layer << "] ";
+            if (curr->parent_partition != NULL)
+            {
+                cout << "p(" << curr-> parent_partition->id << " @ " << curr->parent_partition->layer << ") ";
+            }
             cout << "(" << curr->sub_partition.size() << ") ";
             cout << "out(";
             for(int i = 0; i < curr->boundary_outwards.size(); i++)
@@ -286,7 +291,7 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
             }
             new_level_node_count += curr->sub_partition.size();
         }
-        cout << endl;
+        cout << endl << endl;;
         level_node_count = new_level_node_count;
         new_level_node_count = 0;
     }
