@@ -2,10 +2,9 @@
 #include <cmath>
 #include <algorithm>
 
-#include "ims/map_graph.h"
+#include "../include/ims/map_graph.h"
 #include "../src/partition.h"
 #include "../src/preprocess.h"
-#include "../src/routing.h"
 #include "map_graph_test_data.h"
 
 using namespace std;
@@ -129,12 +128,8 @@ int main()
     assert(mapGraph_square->find_current_density(1, 99) == 0);
     assert(mapGraph_square->find_current_density(1, 100) == 0.1);
 
-    // Weight retrieval function
-    // Travel time needed before time = 100 should be shortest (default)
-    assert(IMS::Routing::retrieve_weight(mapGraph_square, 1, 99) == mapGraph_square->default_travel_time[1]);
-    assert(IMS::Routing::retrieve_weight(mapGraph_square, 1, 100) == 2 * (mapGraph_square->default_travel_time[1]));
 
-    /* Find nearest edge with location tests, longi = x, lat = y */
+    // Find nearest edge with location tests, longi = x, lat = y
     assert(mapGraph_square->find_nearest_edge_of_location(0, 0.5, 0)[0] == 0);
     assert(mapGraph_square->find_nearest_edge_of_location(-0.5, 0.5, 0).empty());
     assert(mapGraph_square->find_nearest_edge_of_location(-0.5, 0.5, 0.5)[0] == 0);
@@ -142,7 +137,7 @@ int main()
     assert(mapGraph_square->find_nearest_edge_of_location(0.5, 0.7, 0.2)[0] == 4);
     assert(mapGraph_square->find_nearest_edge_of_location(0, 0, 0)[0] == 0);
 
-    /* Test for multiple affected edges */
+    // Test for multiple affected edges
     vector<unsigned> affected_edges = mapGraph_square->find_nearest_edge_of_location(0.1, 0.1, 0.1);
     assert(affected_edges.size() == 3);
     assert(find(affected_edges.begin(), affected_edges.end(), 0) != affected_edges.end());

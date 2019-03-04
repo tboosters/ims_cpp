@@ -10,6 +10,7 @@
 
 #include "ims/map_graph.h"
 #include "ims/incident_manager.h"
+#include "ims/router.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ namespace IMS
     private:
         IMS::MapGraph *map_graph;
         IMS::IncidentManager *incident_manager;
+        IMS::Router *router;
 
         // Dev url for checking graph
         void check_graph();

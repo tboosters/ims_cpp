@@ -45,6 +45,7 @@ IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentMana
 {
     this->map_graph = map_graph;
     this->incident_manager = incident_manager;
+    this->router = new IMS::Router(map_graph, incident_manager);
 
     // Dev url for checking graph
     dispatcher().map("GET", "/graph", &IMSApp::check_graph, this);
