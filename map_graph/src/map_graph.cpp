@@ -206,7 +206,9 @@ vector<unsigned> IMS::MapGraph::find_nearest_edge_of_location(const float &longi
     vector<unsigned> nearest_edges;
     for(unsigned tail = 0; tail < first_out.size(); tail++)
     {
-        for(unsigned edge = first_out[tail]; edge < first_out[tail+1] || (tail+1 == first_out.size() && edge < head.size()); edge++)
+        for(unsigned edge = first_out[tail];
+            (tail+1 < first_out.size() && edge < first_out[tail+1]) || (tail+1 == first_out.size() && edge < head.size());
+            edge++)
         {
             if(is_in_line_range(longitude[tail], latitude[tail], longitude[head[edge]], latitude[head[edge]], longi, lat, offset))
             {
