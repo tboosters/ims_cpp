@@ -7,7 +7,7 @@ add_library(map_graph SHARED src/map_graph.cpp include/ims/map_graph.h src/parti
 add_library(incident_manager SHARED src/incident_manager.cpp include/ims/incident_manager.h)
 add_library(ims::map_graph ALIAS map_graph)
 add_library(ims::incident_manager ALIAS incident_manager)
-add_executable(map_graph_test tests/map_graph_test.cpp src/partition.cpp src/partition.h)
+add_executable(map_graph_test tests/map_graph_test.cpp src/partition.cpp src/partition.h src/preprocess.h)
 add_executable(map_graph_real tests/map_graph_real.cpp)
 add_executable(incidents_test tests/incidents_test.cpp src/incident_manager.cpp include/ims/incident_manager.h)
 

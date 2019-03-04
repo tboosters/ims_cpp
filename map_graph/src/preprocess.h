@@ -38,9 +38,12 @@ typedef struct entry_t entry_t;
  */
 typedef vector< vector< entry_t>> distance_table_t;
 
-// Preprocessing
+/* Preprocessing */
 distance_table_t* do_preprocess (const vector<unsigned> &nodes, 
         const IMS::MapGraph* graph, IMS::Partition::partition_t* partitions, IMS::Partition::layer_t* layers);
+
+/* Util functions */
+void print_distance_table (distance_table_t * distance_table);
 
 
 }

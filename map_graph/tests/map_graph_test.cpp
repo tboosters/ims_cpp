@@ -4,6 +4,7 @@
 
 #include "ims/map_graph.h"
 #include "../src/partition.h"
+#include "../src/preprocess.h"
 #include "../src/routing.h"
 #include "map_graph_test_data.h"
 
@@ -12,10 +13,11 @@ using namespace std;
 int main()
 {
     /* Prepare tests data */
-    #define N 9
+    #define N 16
     #define square 4
     #define hand 9
     #define small 12
+    #define hand2 16
     #define large 120
 
     vector<unsigned> nodes(N);
@@ -40,6 +42,11 @@ int main()
     for(int i = 0; i < N; i++) {
         longi[i] = coordinates12[i][0];
         lat[i] = coordinates12[i][1];
+    }
+    #elif N == hand2
+    for (int i = 0; i < N; i++) {
+        longi[i] = coordinates16[i][0];
+        lat[i] = coordinates16[i][1];
     }
     #elif N == large
     for(int i = 0; i < N; i++)
@@ -68,6 +75,11 @@ int main()
         mapGraph->head.assign(head12, head12 + N);
         mapGraph->geo_distance.assign(geo_distance12, geo_distance12 + N);
         mapGraph->default_travel_time.assign(default_travel_time12, default_travel_time12 + N);
+    #elif N == hand2
+        mapGraph->first_out.assign(first_out16, first_out16 + N);
+        mapGraph->head.assign(head16, head16 + 30);
+        mapGraph->geo_distance.assign(geo_distance16, geo_distance16 + 30);
+        mapGraph->default_travel_time.assign(default_travel_time16, default_travel_time16 + 30);
     #elif N == large
         mapGraph->first_out.assign(first_out120, first_out120 + N);
         mapGraph->head.assign(head120, head120 + N);
@@ -103,16 +115,25 @@ int main()
 
     cout << "Layer:" << endl;
     IMS::Partition::print_layer(layer);
-    cout << endl << endl;
+    cout << endl;
 
     cout << IMS::Partition::find_parent(layer, 4, 2); // expected: 4 for N=12, k=2, l=3
     cout << endl;
     cout << IMS::Partition::find_parent(layer, 4); // expected: 4 for N=12, k=2, l=3
+    cout << endl;
 
-    IMS::Partition::delete_partition(p);
+    //IMS::Partition::delete_partition(p);
+
+    /* Preprocess tests */
+    cout << "==== Preprocess Test ====" << endl;
+    IMS::Preprocess::distance_table_t* distance_table = IMS::Preprocess::do_preprocess(nodes, mapGraph, p, &layer);
+    cout << "Distance table:" << endl;
+    IMS::Preprocess::print_distance_table(distance_table);
+    cout << endl;
+
 
     /* Routing tests */
-
+    cout << "==== Routing Test ====" << endl;
     // Find current density
     // Set density for edge 1 to be 0.1 (half of jam density) at time 100
     mapGraph->current_density[1][100] = 0.1;

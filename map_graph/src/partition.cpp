@@ -75,10 +75,11 @@ unordered_map<long, vector<unsigned> > IMS::Partition::grid_partition
  */
 partition_t * IMS::Partition::do_partition
         (const vector<unsigned> &nodes, const IMS::MapGraph *graph, const int &k, const int &l,
-         const unsigned &partition_id)
+         const unsigned &partition_id, const unsigned layer)
 {
     auto p = new IMS::Partition::partition_t();
     p->id = partition_id;
+    p->layer = layer;
     p->is_node = false;
     p->parent_partition = NULL;
     
@@ -135,9 +136,8 @@ partition_t * IMS::Partition::do_partition
     unordered_map<long, vector<unsigned> > sub_partitions = grid_partition(nodes, graph, k);
     long next_pid = 0;
     for (auto & sub_partition : sub_partitions) {
-        partition_t * sp = do_partition(sub_partition.second, graph, k, l - 1, next_pid);
+        partition_t * sp = do_partition(sub_partition.second, graph, k, l - 1, next_pid, layer + 1);
         sp->parent_partition = p;
-
         p->sub_partition.push_back(sp);
         next_pid++;
     }

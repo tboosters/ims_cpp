@@ -29,6 +29,7 @@ namespace Partition
 struct partition_t
 {
     unsigned id;
+    unsigned layer;
     bool is_node;
     vector<unsigned> boundary_outwards;
     vector<unsigned> boundary_inwards;
@@ -51,7 +52,7 @@ unordered_map<long, vector<unsigned> > grid_partition
 /* Partitioning & Layering */
 partition_t * do_partition
             (const vector<unsigned> &nodes, const IMS::MapGraph *graph,
-             const int &k, const int &l, const unsigned &partition_id);
+             const int &k, const int &l, const unsigned &partition_id, const unsigned layer = 0);
 
 void index_partition(partition_t * p);
 
