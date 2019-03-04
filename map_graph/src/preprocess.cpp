@@ -34,7 +34,6 @@ unsigned nodeset_shortest_destance(const IMS::MapGraph* graph, vector<unsigned>*
     // prepare storage for single source graph search
     vector<unsigned> dist(graph->first_out.size() + 2, INFINITY);
     vector<unsigned> prev(graph->first_out.size() + 2, INFINITY); // infinity defined as nil here
-    set<unsigned> s;
     priority_queue<pair<unsigned, unsigned>, vector<pair<unsigned, unsigned>>, greater<pair<unsigned, unsigned>>> q;
 
     for (auto n : (*from_nodes))
@@ -86,6 +85,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
 {    
     // initialize distance table
     distance_table_t* distance_table = new distance_table_t;
+
     for (unsigned int i = 0; i < layers->size() - 1; i++)
     {
         // initialize distance table for layer i
@@ -119,19 +119,12 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             curr = frontier.front(); // m
             frontier.pop();
 
-            //cout << "processing partition id: " << curr->id << ", layer: " << curr->layer << endl;
-
             // inject new temporary vm nodes and edges
-            unsigned vm = graph->first_out.size() + 1;
+            unsigned vm = graph->first_out.size();
             vector<unsigned> vm_head;
             for (unsigned bound_node : curr->boundary_outwards)
             {
                 vm_head.push_back(bound_node);
-            }
-            unordered_map<unsigned, unsigned> vm_head_inversed;
-            for (unsigned bound_node : curr->boundary_inwards)
-            {
-                vm_head_inversed[bound_node] = 0;
             }
 
             // find distance between partition within same bound
@@ -144,7 +137,6 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
                 rep[partition_same_bound->id] = INFINITY;
                 //cout << "initial reg p: " << partition_same_bound->id << " = " << rep[partition_same_bound->id] << endl;
             }
-            set<unsigned> s;
             priority_queue<pair<unsigned, unsigned>, vector<pair<unsigned, unsigned>>, greater<pair<unsigned, unsigned>>> q;
 
             // insert new temp node into q
@@ -223,24 +215,13 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             for (auto partition_same_bound : curr->parent_partition->sub_partition)
             {
                 //cout << "saving at level " << curr->layer << ", from p: " << curr->id << ", to p: " << partition_same_bound->id << ", dist: " << rep[partition_same_bound->id] << endl;
-                (*distance_table)[curr->layer][curr->id].partition_distance[partition_same_bound->id] = dist[rep[partition_same_bound->id]];
+                if (rep[partition_same_bound->id] != (unsigned)INFINITY)
+                {   
+                    (*distance_table)[curr->layer][curr->id].partition_distance[partition_same_bound->id] = dist[rep[partition_same_bound->id]];
+                }
             }
 
-            // find distance to and from the bound borders
-            // inject new temporary vM nodes and edges
-            unsigned vM = vm + 1;
-            vector<unsigned> vM_head;
-            for (unsigned bound_node : curr->parent_partition->boundary_outwards)
-            {
-                vM_head.push_back(bound_node);
-            }
-            unordered_map<unsigned, unsigned> vM_head_inversed;
-            for (unsigned bound_node : curr->parent_partition->boundary_inwards)
-            {
-                vM_head_inversed[bound_node] = 0;
-            }
-
-            // calculate distances
+            // find distance to and from the bound borde
             (*distance_table)[curr->layer][curr->id].outbound_distance = nodeset_shortest_destance(graph, &(curr->boundary_outwards),&(curr->parent_partition->boundary_outwards));
             (*distance_table)[curr->layer][curr->id].inbound_distance = nodeset_shortest_destance(graph, &(curr->parent_partition->boundary_inwards), &(curr->boundary_inwards));
 
@@ -256,13 +237,12 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
                     new_level_node_count += 1;
                 }
             }
-            //new_level_node_count += curr->sub_partition.size();
-
         }
+
         level_node_count = new_level_node_count;
         new_level_node_count = 0;
     }
-
+    
     return distance_table;
 }
 
