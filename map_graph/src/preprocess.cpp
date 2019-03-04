@@ -16,26 +16,20 @@ using namespace std;
 using namespace IMS::Preprocess;
 
 // helper function
-/* Perform single source shortest distance search from an extra node to and extra node
+/* Perform single source shortest distance search from a set of nodes to a set nof nodes
  * Parameters: const IMS:MapGraph* graph
- *             vector<unsigned>* extra_outward_edges : temporary edges from the origin node
- *             unordered_map<unsigned, unsigned>* extra_inward_edges : temporary edges to the target node
+ *             vector<unsigned>* from_nodes : origin node set
+ *             vector<unsigned>* to_nodes : target node set
  */
-unsigned modified_shortest_destance(const IMS::MapGraph* graph, vector<unsigned>* extra_outward_edges, 
-                                    unordered_map<unsigned, unsigned>* extra_inward_edges)
-{
-    cout << "out: ";
-    for (auto e : (*extra_outward_edges))
+unsigned nodeset_shortest_destance(const IMS::MapGraph* graph, vector<unsigned>* from_nodes, 
+                                    vector<unsigned>* to_nodes)
+{    
+    // create node set for to nodes
+    set<unsigned> to_set;
+    for(auto n : (*to_nodes))
     {
-        cout << e << ", ";
+        to_set.insert(n);
     }
-    cout << endl;
-    cout << "in: ";
-    for (auto e : (*extra_inward_edges))
-    {
-        cout << e.first << ", ";
-    }
-    cout << endl;
 
     // prepare storage for single source graph search
     vector<unsigned> dist(graph->first_out.size() + 2, INFINITY);
@@ -43,11 +37,11 @@ unsigned modified_shortest_destance(const IMS::MapGraph* graph, vector<unsigned>
     set<unsigned> s;
     priority_queue<pair<unsigned, unsigned>, vector<pair<unsigned, unsigned>>, greater<pair<unsigned, unsigned>>> q;
 
-    // insert new temp node into q
-    unsigned origin = graph->first_out.size();
-    unsigned target = graph->first_out.size() + 1;
-    q.push(make_pair(0, origin));
-    dist[origin] = 0;
+    for (auto n : (*from_nodes))
+    {
+        q.push(make_pair(0, n));
+        dist[n] = 0;
+    }
 
     // process the node u with minimum dist[u]
     while (!q.empty())
@@ -56,52 +50,26 @@ unsigned modified_shortest_destance(const IMS::MapGraph* graph, vector<unsigned>
         q.pop();
         
         // premature end the graph search if target reached
-        if (u == target)
+        if (to_set.count(u) > 0)
         {
             return dist[u];
         }
 
         // expand neighbours
-        if (u != origin)
+        unsigned first_edge = graph->first_out[u];
+        unsigned last_edge = (u == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[u + 1];
+        for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
         {
-            unsigned first_edge = graph->first_out[u];
-            unsigned last_edge = (u == graph->first_out.size() -1) ? (graph->head.size()) : graph->first_out[u + 1];
-            for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
+            unsigned v = graph->head[current_edge];
+            if (dist[v] > dist[u] + graph->default_travel_time[current_edge])
             {
-                unsigned v = graph->head[current_edge];
-                if (dist[v] > dist[u] + graph->default_travel_time[current_edge])
-                {
-                    dist[v] = dist[u] + graph->default_travel_time[current_edge];
-                    prev[v] = u;
-                    q.push(make_pair(dist[v], v));
-                }
-            }
-            if ((*extra_inward_edges).count(u) > 0)
-            {
-                unsigned v = target;
-                if (dist[v] > dist[u] + 0)
-                {
-                    dist[v] = dist[u] + 0;
-                    prev[v] = u;
-                    q.push(make_pair(dist[v], v));
-                }
-            }
-        }
-        else
-        {
-            for (unsigned int current_edge = 0; current_edge < (*extra_outward_edges).size(); current_edge ++)
-            {
-                unsigned v = (*extra_outward_edges)[current_edge];
-                if (dist[v] > dist[u] + 0)
-                {
-                    dist[v] = dist[u] + 0;
-                    prev[v] = u;
-                    q.push(make_pair(dist[v], v));
-                }
+                dist[v] = dist[u] + graph->default_travel_time[current_edge];
+                prev[v] = u;
+                q.push(make_pair(dist[v], v));
             }
         }
     }
-    return 0;
+    return INFINITY;
 }
 
 
@@ -125,17 +93,22 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
         for (unsigned j = 0; j < (*layers)[i].size(); j++)
         {
             entry_t entry;
+            entry.inbound_distance = INFINITY;
+            entry.outbound_distance = INFINITY;
             dti.push_back(entry);
         }
         distance_table->push_back(dti);
     }
 
     // extra information for partition traversal
-    int level_node_count = 1;
+    int level_node_count = partitions->sub_partition.size();
     int new_level_node_count = 0;
     queue<IMS::Partition::partition_t*> frontier;
     IMS::Partition::partition_t * curr;
-    frontier.push(partitions->sub_partition[0]);
+    for (auto p : partitions->sub_partition)
+    {
+        frontier.push(p);
+    }
 
     // traverse the partitions
     while(!frontier.empty())
@@ -146,7 +119,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             curr = frontier.front(); // m
             frontier.pop();
 
-            cout << "processing partition id: " << curr->id << ", layer: " << curr->layer << endl;
+            //cout << "processing partition id: " << curr->id << ", layer: " << curr->layer << endl;
 
             // inject new temporary vm nodes and edges
             unsigned vm = graph->first_out.size() + 1;
@@ -169,7 +142,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             for (auto partition_same_bound : curr->parent_partition->sub_partition)
             {
                 rep[partition_same_bound->id] = INFINITY;
-                cout << "initial reg p: " << partition_same_bound->id << " = " << rep[partition_same_bound->id] << endl;
+                //cout << "initial reg p: " << partition_same_bound->id << " = " << rep[partition_same_bound->id] << endl;
             }
             set<unsigned> s;
             priority_queue<pair<unsigned, unsigned>, vector<pair<unsigned, unsigned>>, greater<pair<unsigned, unsigned>>> q;
@@ -195,7 +168,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
                     }
                     if (rep[c] == (unsigned)INFINITY) 
                     {
-                        cout << "regestered p: " << c << endl;
+                        //cout << "regestered p: " << c << endl;
                         rep[c] = u;
                     } 
                 }
@@ -249,7 +222,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             // all distance information towards partitions within the same bound into distance table
             for (auto partition_same_bound : curr->parent_partition->sub_partition)
             {
-                cout << "saving at level " << curr->layer << ", from p: " << curr->id << ", to p: " << partition_same_bound->id << ", dist: " << rep[partition_same_bound->id] << endl;
+                //cout << "saving at level " << curr->layer << ", from p: " << curr->id << ", to p: " << partition_same_bound->id << ", dist: " << rep[partition_same_bound->id] << endl;
                 (*distance_table)[curr->layer][curr->id].partition_distance[partition_same_bound->id] = dist[rep[partition_same_bound->id]];
             }
 
@@ -268,9 +241,8 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
             }
 
             // calculate distances
-            (*distance_table)[curr->layer][curr->id].outbound_distance = modified_shortest_destance(graph, &vm_head, &vM_head_inversed);
-            (*distance_table)[curr->layer][curr->id].outbound_distance = modified_shortest_destance(graph, &vM_head, &vm_head_inversed);
-
+            (*distance_table)[curr->layer][curr->id].outbound_distance = nodeset_shortest_destance(graph, &(curr->boundary_outwards),&(curr->parent_partition->boundary_outwards));
+            (*distance_table)[curr->layer][curr->id].inbound_distance = nodeset_shortest_destance(graph, &(curr->parent_partition->boundary_inwards), &(curr->boundary_inwards));
 
             // remove temp node and vertex
             // -- due to implementation, nothing need to be done
