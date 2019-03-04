@@ -86,7 +86,7 @@ distance_table_t* IMS::Preprocess::do_preprocess (const vector<unsigned> &nodes,
 {    
     // initialize distance table
     distance_table_t* distance_table = new distance_table_t;
-    for (unsigned int i = 0; i < layers->size(); i++)
+    for (unsigned int i = 0; i < layers->size() - 1; i++)
     {
         // initialize distance table for layer i
         vector<entry_t> dti;
