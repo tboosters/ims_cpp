@@ -12,7 +12,7 @@ using namespace std;
 int main()
 {
     /* Prepare tests data */
-    #define N 16
+    #define N 4
     #define square 4
     #define hand 9
     #define hand2 16

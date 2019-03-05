@@ -19,9 +19,13 @@ int main()
     map_graph->default_travel_time.assign(default_travel_time4, default_travel_time4 + 5);
     map_graph->initialize();
     map_graph->current_density[1][100] = 0.1;
+    map_graph->partition(2, 3);
+    map_graph->preprocess();
 
     auto incident_manager = new IMS::IncidentManager();
     auto router = new IMS::Router(map_graph, incident_manager);
+
+    cout << router->retrieve_future_weight(0, 3) << endl;
 
     cout << "==== Router Test ====" << endl;
     // Weight retrieval function
