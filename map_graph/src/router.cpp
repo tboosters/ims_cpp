@@ -16,16 +16,17 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned from_node, const uns
 {
     IMS::Preprocess::distance_table_t* distance_table = map_graph->distance_tables;
     IMS::Partition::layer_t* layers = map_graph->layers;
-    unsigned from_partition = from_node;
-    unsigned to_partition = to_node;
     unsigned future_weight = 0;
-    for (unsigned i = layers->size()-1; i > 0; i--)
-    {
-        // move up one level
-        from_partition = (*layers)[i][from_partition];
-        to_partition = (*layers)[i][to_partition];
-        if (from_partition != to_partition)
+    // retrieve first partition
+    unsigned from_partition = (*layers)[layers->size()-1][from_node];
+    unsigned to_partition = (*layers)[layers->size()-1][to_node];
+    for (unsigned i = layers->size()-2; i > 0; i--)
+    { 
+        if ((*layers)[i][from_partition] != (*layers)[i][to_partition])
         {
+            //cout << "i: " << i << ", from: " << from_partition << ", to: " << to_partition << endl;
+            //cout << "+ " << (*distance_table)[i][from_partition].outbound_distance << endl;
+            //cout << "+ " << (*distance_table)[i][to_partition].inbound_distance << endl;
             // both nodes are in partitions in separate bound at level i
             future_weight += (*distance_table)[i][from_partition].outbound_distance;
             future_weight += (*distance_table)[i][to_partition].inbound_distance;
@@ -33,11 +34,14 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned from_node, const uns
         else
         {
             // both nodes are in partitions in the same bound at level i
+            //cout << "+ " << (*distance_table)[i][from_partition].partition_distance[to_partition] << endl;
             future_weight += (*distance_table)[i][from_partition].partition_distance[to_partition];
             break;
         }
+        // move up one level       
+        from_partition = (*layers)[i][from_partition];
+        to_partition = (*layers)[i][to_partition];
     }
-
     return future_weight;
 }
 
