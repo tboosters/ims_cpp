@@ -94,8 +94,12 @@ namespace IMS
         /* Routing */
         double find_current_density(unsigned edge, time_t enter_time);
 
-        /* Incident Management */
+        /* Updating */
+        void update_with_routed_path(IMS::Path * path);
+
+        /* Reverse Geocoding */
         vector<unsigned int> find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset);
+        unsigned find_nearest_node_of_location(const float & longi, const float & lat, const float & radius);
 
         /* Util Functions */
         void print_graph();
@@ -104,6 +108,7 @@ namespace IMS
 
 }
 
+/* Schema for serialization of MapGraph in Boost.Serialization */
 namespace boost
 {
 namespace serialization

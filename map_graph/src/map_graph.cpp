@@ -150,7 +150,52 @@ double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
     }
 }
 
-/* Incident Managemet */
+/* Updating */
+void IMS::MapGraph::update_with_routed_path(IMS::Path * path)
+{
+    unsigned edge;
+    time_t enter_time, leave_time;
+    double density_delta;
+    auto next_enter_time_edge = path->enter_times.begin();
+    next_enter_time_edge++;
+
+    for (auto &enter_time_edge : path->enter_times)
+    {
+        edge = enter_time_edge.second;
+        enter_time = enter_time_edge.first;
+        leave_time = next_enter_time_edge == path->enter_times.end()? path->end_time : next_enter_time_edge->first;
+        density_delta = 1.0 / geo_distance[edge];
+
+        // When vehicle leaves edge, restore density
+        // Case where leave_time exists can be skipped as traffic density will be retained as the same anyways
+        auto before_leave_time = current_density[edge].lower_bound(leave_time);
+        if(before_leave_time->first != leave_time)
+        {
+            current_density[edge][leave_time] = (--before_leave_time)->second;
+        }
+
+        // When vehicle enters edge
+        auto before_enter_time = current_density[edge].lower_bound(enter_time);
+        if(before_enter_time->first == enter_time)
+        {
+            current_density[edge][enter_time] += density_delta;
+        }
+        else
+        {
+            current_density[edge][enter_time] = (--before_enter_time)->second + density_delta;
+        }
+
+        // When vehicle is in the edge
+        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first != leave_time; intermediate++)
+        {
+            intermediate->second += density_delta;
+        }
+
+        next_enter_time_edge++;
+    }
+}
+
+/* Reverse Geocoding */
 
 /* Determine if point q is in range / linear with line formed by points p1 and p2
  * Parameters: const float & p1_x
@@ -215,6 +260,19 @@ vector<unsigned> IMS::MapGraph::find_nearest_edge_of_location(const float &longi
 
     return nearest_edges;
 }
+
+/* Entrance function to find which node this location is on or the nearest node.
+ * Parameters: const float & lat
+ *             const float & longi
+ *             const float & radius
+ * Returns: unsigned: nearest nodes' id, RoutingKit::invalid_id if not found
+ */
+unsigned IMS::MapGraph::find_nearest_node_of_location(const float &longi, const float &lat, const float & radius)
+{
+    return map_geo_position.find_nearest_neighbor_within_radius(lat, longi, radius).id;
+}
+
+/**/
 
 /* Utils */
 

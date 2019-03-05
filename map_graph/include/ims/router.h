@@ -26,8 +26,7 @@ public:
     unsigned retrieve_future_weight(const unsigned from_node, const unsigned to_node);
     double retrieve_realized_weight(const unsigned &edge, const time_t &enter_time);
 
-    IMS::Path* route(const double &origin_long, const double &origin_lat, const double &dest_long,
-                     const double &dest_lat, const time_t &start_time);
+    IMS::Path *route(const unsigned &origin, const unsigned &destination, const time_t &start_time);
 
 
 };

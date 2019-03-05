@@ -54,7 +54,6 @@ IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentMana
     dispatcher().map("POST", "/route", &IMSApp::route, this);
     dispatcher().map("POST", "/incident", &IMSApp::inject_incident, this);
     dispatcher().map("DELETE", "/incident", &IMSApp::remove_incident, this);
-    dispatcher().map("POST", "/update_graph", &IMSApp::handle_graph_update, this);
 }
 
 void IMSApp::check_graph()
@@ -84,22 +83,32 @@ void IMSApp::route()
     double destination_lat = json_data["coordinates"][1][1].number();
 
     /* Reverse Geocoding for origin and destination */
-    unsigned origin =
-            map_graph->map_geo_position.find_nearest_neighbor_within_radius(origin_lat, origin_long, 500).id;
-    unsigned destination =
-            map_graph->map_geo_position.find_nearest_neighbor_within_radius(destination_lat, destination_long, 500).id;
+    unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, 500);
+    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, 500);
     if(origin == RoutingKit::invalid_id)
     {
-        response().make_error_response(404, "No node within 500m from origin position.");
+        response().make_error_response(400, "No node within 500m from origin position.");
         return;
     }
     if(destination == RoutingKit::invalid_id)
     {
-        response().make_error_response(404, "No node within 500m from destination position.");
+        response().make_error_response(400, "No node within 500m from destination position.");
         return;
     }
 
     printf("%f, %f\n%f, %f\n%d, %d", origin_long, origin_lat, destination_long, destination_lat, origin, destination);
+
+//    /* Perform routing */
+//    time_t now = time(nullptr);
+//    IMS::Path * path = router->route(origin, destination, now);
+//
+//    /* Write route to response */
+//    cppcms::json::value response_body;
+//    response_body["data"] = ???;
+//    response().out() << response_body;
+//
+//    /* Perform graph update */
+//    map_graph->update_with_routed_path(path);
 
     /* Load sample_route.json */
     ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
@@ -184,10 +193,4 @@ void IMSApp::remove_incident()
     }
 
     response().status(200);
-
-}
-
-void IMSApp::handle_graph_update()
-{
-    response().out() << "handle_graph_update";
 }

@@ -135,9 +135,7 @@ int main()
     cout << endl;
     #endif
 
-    /* Routing tests */
-    cout << "==== Routing Test ====" << endl;
-    
+    /* Test graph for Reverse Geocoding and Update Tests */
     auto mapGraph_square = new IMS::MapGraph();
     for(int i = 0; i < 4; i++) {
         mapGraph_square->longitude.push_back(coordinates4[i][0]);
@@ -149,12 +147,15 @@ int main()
     mapGraph_square->default_travel_time.assign(default_travel_time4, default_travel_time4 + 5);
     mapGraph_square->initialize();
 
+    /* Routing tests */
+    cout << "==== Reverse Geocoding Test ====" << endl;
     // Find current density
     // Set density for edge 1 to be 0.1 (half of jam density) at time 100
     mapGraph_square->current_density[1][100] = 0.1;
     // Density of time >= 100 should be 0.1 and time < 100 should be 0
     assert(mapGraph_square->find_current_density(1, 99) == 0);
     assert(mapGraph_square->find_current_density(1, 100) == 0.1);
+    mapGraph_square->current_density[1].erase(100);
 
 
     // Find nearest edge with location tests, longi = x, lat = y
@@ -172,7 +173,81 @@ int main()
     assert(find(affected_edges.begin(), affected_edges.end(), 1) != affected_edges.end());
     assert(find(affected_edges.begin(), affected_edges.end(), 4) != affected_edges.end());
 
-    cout << "==== All Routing Test passed ====" << endl;
+    cout << "==== All Reverse Geocoding Test passed ====" << endl;
+    cout << endl;
+
+    /* Graph Update Tests */
+    // Create Path
+    auto path1 = new IMS::Path();
+    path1->start_time = 60;
+    path1->end_time = 120;
+    path1->enter_times[60] = 0;
+    path1->enter_times[90] = 1;
+    path1->enter_times[100] = 3;
+
+    auto pathEarly0 = new IMS::Path();
+    pathEarly0->start_time = 50;
+    pathEarly0->end_time = 70;
+    pathEarly0->enter_times[50] = 0;
+
+    auto pathLate1 = new IMS::Path();
+    pathLate1->start_time = 95;
+    pathLate1->end_time = 110;
+    pathLate1->enter_times[95] = 1;
+
+    auto pathSame3 = new IMS::Path();
+    pathSame3->start_time = 100;
+    pathSame3->end_time = 120;
+    pathSame3->enter_times[100] = 3;
+
+    cout << "==== Graph Update Test ====" << endl;
+
+    // Case: Empty density cache, i.e. no previous vehicles
+    mapGraph_square->update_with_routed_path(path1);
+    // Path1 - edge 0
+    assert(mapGraph_square->current_density[0].size() == 3);
+    assert(mapGraph_square->current_density[0][0] == 0);
+    assert(mapGraph_square->current_density[0][60] == 1.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][90] == 0);
+    // Path1 - edge 1
+    assert(mapGraph_square->current_density[1].size() == 3);
+    assert(mapGraph_square->current_density[1][0] == 0);
+    assert(mapGraph_square->current_density[1][90] == 1.0 / mapGraph_square->geo_distance[1]);
+    assert(mapGraph_square->current_density[1][100] == 0);
+    // Path1 - edge 3
+    assert(mapGraph_square->current_density[3].size() == 3);
+    assert(mapGraph_square->current_density[3][0] == 0);
+    assert(mapGraph_square->current_density[3][100] == 1.0 / mapGraph_square->geo_distance[3]);
+    assert(mapGraph_square->current_density[3][120] == 0);
+
+    // Case: Another vehicle comes earlier and leaves earlier.
+    // Note: Impossible for other vehicles to come earlier and leave later.
+    mapGraph_square->update_with_routed_path(pathEarly0);
+    assert(mapGraph_square->current_density[0].size() == 5);
+    assert(mapGraph_square->current_density[0][0] == 0);
+    assert(mapGraph_square->current_density[0][50] == 1.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][60] == 2.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][70] == 1.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][90] == 0);
+
+    // Case: Another vehicle comes later and leaves later
+    // Note: Impossible for other vehicles to come later and leave earlier.
+    mapGraph_square->update_with_routed_path(pathLate1);
+    assert(mapGraph_square->current_density[1].size() == 5);
+    assert(mapGraph_square->current_density[1][0] == 0);
+    assert(mapGraph_square->current_density[1][90] == 1.0 / mapGraph_square->geo_distance[1]);
+    assert(mapGraph_square->current_density[1][95] == 2.0 / mapGraph_square->geo_distance[1]);
+    assert(mapGraph_square->current_density[1][100] == 1.0 / mapGraph_square->geo_distance[1]);
+    assert(mapGraph_square->current_density[1][110] == 0);
+
+    // Case: Another vehicle comes and leaves at existing critical time
+    mapGraph_square->update_with_routed_path(pathSame3);
+    assert(mapGraph_square->current_density[3].size() == 3);
+    assert(mapGraph_square->current_density[3][0] == 0);
+    assert(mapGraph_square->current_density[3][100] == 2.0 / mapGraph_square->geo_distance[3]);
+    assert(mapGraph_square->current_density[3][120] == 0);
+
+    cout << "==== All Graph Update Test passed ====" << endl;
 
     return 0;
 }
