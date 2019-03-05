@@ -22,7 +22,7 @@ int main()
     IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, graph->latitude, graph->longitude,
             graph->head, graph->first_out, graph->inversed->head, graph->inversed->first_out, k, lvl, 0);
     IMS::Partition::index_partition(p);
-    IMS::Partition::layer_t l = IMS::Partition::build_layer(p, nodes.size());
+    IMS::Partition::layer_t* l = IMS::Partition::build_layer(p, nodes.size());
 
     while(1)
     {

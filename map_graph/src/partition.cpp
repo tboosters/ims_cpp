@@ -210,10 +210,10 @@ void IMS::Partition::index_partition(partition_t * p)
  *            const unsigned long & num_of_nodes
  * Return: layer_t
  * */
-layer_t IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsigned long &num_of_nodes)
+layer_t* IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsigned long &num_of_nodes)
 {
-    layer_t layer(1);
-    layer[0].push_back(INFINITY);
+    auto layer = new IMS::Partition::layer_t(1);
+    (*layer)[0].push_back(INFINITY);
 
     int level_node_count = 1;
     int new_level_node_count = 0;
@@ -251,12 +251,12 @@ layer_t IMS::Partition::build_layer(IMS::Partition::partition_t *p, const unsign
 
         if(!frontier.empty())
         {
-            layer.push_back(next_level);
+            (*layer).push_back(next_level);
         }
         level_node_count = new_level_node_count;
         new_level_node_count = 0;
     }
-    layer.push_back(nodes);
+    (*layer).push_back(nodes);
 
     return layer;
 }
@@ -317,12 +317,12 @@ void IMS::Partition::print_partition(IMS::Partition::partition_t * p)
 }
 
 /* Print layer structure.
- * Parameters: const IMS::Partition::layer_t & layer
+ * Parameters: const IMS::Partition::layer_t* layer
  * Return: when layer is printed
  */
-void IMS::Partition::print_layer(const IMS::Partition::layer_t & layer)
+void IMS::Partition::print_layer(const IMS::Partition::layer_t* layer)
 {
-    for(const auto &l : layer)
+    for(const auto &l : (*layer))
     {
         for(auto p : l)
         {
@@ -334,24 +334,24 @@ void IMS::Partition::print_layer(const IMS::Partition::layer_t & layer)
 
 
 /* Retrieves parent partition of a node at specified level.
- * Parameters: const IMS::Partition::layer_t & layer
+ * Parameters: const IMS::Partition::layer_t* layer
  *             const long & node
  *             const long & level: optional, omit to get immediate parent
  * Return: long: partition_id of parent
  */
-long IMS::Partition::find_parent(const IMS::Partition::layer_t &layer, const long &node, const long &level/* = -1 */)
+long IMS::Partition::find_parent(const IMS::Partition::layer_t* layer, const long &node, const long &level/* = -1 */)
 {
     long parent = node;
 
     if(level == -1)
     {
-        parent = layer[layer.size()-1][node];
+        parent = (*layer)[layer->size()-1][node];
     }
     else
     {
-        for(unsigned long i = layer.size()-1; i > level; i--)
+        for(unsigned long i = layer->size()-1; i > level; i--)
         {
-            parent = layer[i][parent];
+            parent = (*layer)[i][parent];
         }
     }
 

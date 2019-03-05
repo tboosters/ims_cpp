@@ -67,14 +67,14 @@ partition_t * do_partition
 
 void index_partition(partition_t * p);
 
-layer_t build_layer(IMS::Partition::partition_t * p, const unsigned long & num_of_nodes);
+layer_t* build_layer(IMS::Partition::partition_t * p, const unsigned long & num_of_nodes);
 
 /* Util functions */
 void print_partition(partition_t * p);
 
-void print_layer(const layer_t & layer);
+void print_layer(const layer_t* layer);
 
-long find_parent(const layer_t &layer, const long &node, const long &level = -1);
+long find_parent(const layer_t* layer, const long &node, const long &level = -1);
 
 void delete_partition(partition_t *& p);
 

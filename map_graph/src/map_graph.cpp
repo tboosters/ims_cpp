@@ -105,15 +105,14 @@ void IMS::MapGraph::partition(const int &k, const int &l)
     vector<unsigned int> nodes(latitude.size());
     for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
 
-    IMS::Partition::partition_t * partitions = IMS::Partition::do_partition(nodes, this->latitude , this->longitude, 
+    IMS::Partition::partition_t* partitions = IMS::Partition::do_partition(nodes, this->latitude , this->longitude, 
             this->head, this->first_out, this->inversed->head, this->inversed->first_out, k, l, 0);
     IMS::Partition::index_partition(partitions);
-    IMS::Partition::layer_t layers = IMS::Partition::build_layer(partitions, latitude.size());
-    IMS::Partition::print_layer(layers);
+    IMS::Partition::layer_t* layers = IMS::Partition::build_layer(partitions, latitude.size());
 
     // save information
     this->partitions = partitions;
-    this->layers = &layers;
+    this->layers = layers;
 }
 
 /* Entrance function of preprocessing of this MapGraph
