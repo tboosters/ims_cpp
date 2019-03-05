@@ -5,10 +5,9 @@
  */
 
 #ifndef IMS_CPP_PREPROCESS_H
-#define IMS_CPP_PREPRECESS_H
+#define IMS_CPP_PREPROCESS_H
 
 #include <vector>
-#include <ims/map_graph.h>
 #include "partition.h"
 
 using namespace std;
@@ -39,8 +38,13 @@ typedef struct entry_t entry_t;
 typedef vector< vector< entry_t>> distance_table_t;
 
 /* Preprocessing */
-distance_table_t* do_preprocess (const vector<unsigned> &nodes, 
-        const IMS::MapGraph* graph, IMS::Partition::partition_t* partitions, IMS::Partition::layer_t* layers);
+distance_table_t* do_preprocess 
+        (const vector<unsigned> &nodes, 
+         const vector<unsigned>& head,
+         const vector<unsigned>& first_out,
+         const vector<unsigned>& default_travel_time,
+         IMS::Partition::partition_t* partitions, 
+         IMS::Partition::layer_t* layers);
 
 /* Util functions */
 void print_distance_table (distance_table_t * distance_table);

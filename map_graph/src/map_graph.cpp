@@ -14,8 +14,8 @@
 #include <routingkit/geo_position_to_node.h>
 
 #include "../include/ims/map_graph.h"
-#include "partition.h"
-#include "preprocess.h"
+//#include "partition.h"
+//#include "preprocess.h"
 
 using namespace std;
 
@@ -105,19 +105,30 @@ void IMS::MapGraph::partition(const int &k, const int &l)
     vector<unsigned int> nodes(latitude.size());
     for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
 
-    IMS::Partition::partition_t * partition = IMS::Partition::do_partition(nodes, this, k, l, 0);
-    IMS::Partition::index_partition(partition);
-    IMS::Partition::layer_t layer = IMS::Partition::build_layer(partition, latitude.size());
-    IMS::Partition::print_layer(layer);
+    IMS::Partition::partition_t * partitions = IMS::Partition::do_partition(nodes, this->latitude , this->longitude, 
+            this->head, this->first_out, this->inversed->head, this->inversed->first_out, k, l, 0);
+    IMS::Partition::index_partition(partitions);
+    IMS::Partition::layer_t layers = IMS::Partition::build_layer(partitions, latitude.size());
+    IMS::Partition::print_layer(layers);
+
+    // save information
+    this->partitions = partitions;
+    this->layers = &layers;
 }
 
 /* Entrance function of preprocessing of this MapGraph
- * Parameters:
- * Return:
+ * Parameters: Nil
+ * Return: when preprocess is done
  */
 void IMS::MapGraph::preprocess()
 {
+    vector<unsigned int> nodes(latitude.size());
+    for(unsigned i = 0; i < nodes.size(); i++) nodes[i] = i;
 
+    auto distance_tables = IMS::Preprocess::do_preprocess(nodes, this->head, this->first_out, this->default_travel_time, this->partitions, this->layers);
+    
+    // save information
+    this->distance_tables = distance_tables;
 }
 
 /* Routing */

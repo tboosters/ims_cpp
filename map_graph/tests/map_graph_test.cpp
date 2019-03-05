@@ -81,7 +81,8 @@ int main()
     int l = 3;
 
     cout << "==== Partition & Layer Test ====" << endl;
-    IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph, k, l, 0);
+    IMS::Partition::partition_t * p = IMS::Partition::do_partition(nodes, mapGraph->latitude, mapGraph->longitude,
+            mapGraph->head, mapGraph->first_out, mapGraph->inversed->head, mapGraph->inversed->first_out, k, l, 0);
     IMS::Partition::index_partition(p);
     auto layer = IMS::Partition::build_layer(p, lat.size());
 
@@ -102,7 +103,8 @@ int main()
 
     /* Preprocess tests */
     cout << "==== Preprocess Test ====" << endl;
-    IMS::Preprocess::distance_table_t* distance_table = IMS::Preprocess::do_preprocess(nodes, mapGraph, p, &layer);
+    IMS::Preprocess::distance_table_t* distance_table = IMS::Preprocess::do_preprocess(nodes, mapGraph->head, 
+            mapGraph->first_out, mapGraph->default_travel_time, p, &layer);
     cout << "Distance table:" << endl;
     IMS::Preprocess::print_distance_table(distance_table);
     cout << endl;

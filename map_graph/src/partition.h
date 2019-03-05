@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <ims/map_graph.h>
 
 using namespace std;
 
@@ -47,12 +46,24 @@ typedef vector< vector<unsigned> > layer_t;
 
 /* Partition Scheme */
 unordered_map<long, vector<unsigned> > grid_partition
-        (const vector<unsigned> &nodes, const IMS::MapGraph * graph, const int &k);
+        (const vector<unsigned> &nodes, 
+         const vector<float> &latitude, 
+         const vector<float> &longitude, 
+         const int &k);
 
 /* Partitioning & Layering */
 partition_t * do_partition
-            (const vector<unsigned> &nodes, const IMS::MapGraph *graph,
-             const int &k, const int &l, const unsigned &partition_id, const unsigned layer = 0);
+        (const vector<unsigned> &nodes, 
+         const vector<float> &latitude, 
+         const vector<float> &longitude,
+         const vector<unsigned> &head, 
+         const vector<unsigned> &first_out, 
+         const vector<unsigned> &head_inversed, 
+         const vector<unsigned> &first_out_inversed, 
+         const int &k, 
+         const int &l,
+         const unsigned &partition_id,
+        const unsigned layer = 0);
 
 void index_partition(partition_t * p);
 

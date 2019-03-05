@@ -23,7 +23,12 @@ private:
 public:
     Router(IMS::MapGraph * mg, IMS::IncidentManager * im) : map_graph(mg), incident_manager(im) {};
 
+    unsigned retrieve_future_weight(const unsigned from_node, const unsigned to_node);
+
     double retrieve_weight(const unsigned & edge, const time_t & enter_time);
+
+    IMS::Path* do_route(const time_t& start_time);
+
 
 };
 }

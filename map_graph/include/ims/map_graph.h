@@ -19,6 +19,9 @@
 #include <boost/serialization/map.hpp>
 #include <routingkit/geo_position_to_node.h>
 
+#include "../src/partition.h"
+#include "../src/preprocess.h"
+
 using namespace std;
 
 namespace IMS
@@ -51,6 +54,11 @@ namespace IMS
         vector<unsigned> default_travel_time; // seconds
         InversedGraph* inversed;
         RoutingKit::GeoPositionToNode map_geo_position; // Reversed geocoding index
+
+        // Preprocessed data
+        IMS::Partition::partition_t* partitions;
+        IMS::Partition::layer_t* layers;
+        IMS::Preprocess::distance_table_t* distance_tables;
 
         // Density related
         // current_density: vector id = edge ID, map key = critical change time, map value = density
