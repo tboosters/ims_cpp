@@ -151,20 +151,6 @@ double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
     }
 }
 
-/* Performs routing OD requests with this MapGraph starting at time and location specified.
- * Parameters: const double & origin_long
- *             const double & origin_lat
- *             const double & dest_long
- *             const double & dest_lat
- *             const time_t & start_time
- * Return: IMS::Path: Path found consisting all edges involved and enter time to each edge
- */
-IMS::Path IMS::MapGraph::route(const double &origin_long, const double &origin_lat, const double &dest_long,
-                               const double &dest_lat, const time_t &start_time)
-{
-    return IMS::Path();
-}
-
 /* Incident Managemet */
 
 /* Determine if point q is in range / linear with line formed by points p1 and p2

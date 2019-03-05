@@ -24,10 +24,10 @@ public:
     Router(IMS::MapGraph * mg, IMS::IncidentManager * im) : map_graph(mg), incident_manager(im) {};
 
     unsigned retrieve_future_weight(const unsigned from_node, const unsigned to_node);
+    double retrieve_realized_weight(const unsigned &edge, const time_t &enter_time);
 
-    double retrieve_weight(const unsigned & edge, const time_t & enter_time);
-
-    IMS::Path* do_route(const time_t& start_time);
+    IMS::Path* route(const double &origin_long, const double &origin_lat, const double &dest_long,
+                     const double &dest_lat, const time_t &start_time);
 
 
 };

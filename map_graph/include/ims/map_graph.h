@@ -94,9 +94,6 @@ namespace IMS
         /* Routing */
         double find_current_density(unsigned edge, time_t enter_time);
 
-        Path route(const double & origin_long, const double & origin_lat,
-                const double & dest_long, const double & dest_lat, const time_t & start_time);
-
         /* Incident Management */
         vector<unsigned int> find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset);
 

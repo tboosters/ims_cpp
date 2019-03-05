@@ -26,8 +26,8 @@ int main()
     cout << "==== Router Test ====" << endl;
     // Weight retrieval function
     // Travel time needed before time = 100 should be shortest (default)
-    assert(router->retrieve_weight(1, 99) == map_graph->default_travel_time[1]);
-    assert(router->retrieve_weight(1, 100) == 2 * (map_graph->default_travel_time[1]));
+    assert(router->retrieve_realized_weight(1, 99) == map_graph->default_travel_time[1]);
+    assert(router->retrieve_realized_weight(1, 100) == 2 * (map_graph->default_travel_time[1]));
 
     cout << "==== All Router Test passed ====" << endl;
 }

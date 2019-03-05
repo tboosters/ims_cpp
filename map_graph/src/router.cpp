@@ -7,7 +7,7 @@
 
 #include "../include/ims/router.h"
 
-/* Future weight retrieval function, calculate the estimated future weight between two nodes.
+/* Future weight retrieval function, calculate the estimated future weight (heuristics) between two nodes.
  * Parameters: const unsigned from_node
  *             const unsigned to_node
  * Return: h(u, t) -> estimated time needed to travel from u to t
@@ -26,7 +26,7 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned from_node, const uns
         to_partition = (*layers)[i][to_partition];
         if (from_partition != to_partition)
         {
-            // both nodes are in partitions in seperate bound at level i
+            // both nodes are in partitions in separate bound at level i
             future_weight += (*distance_table)[i][from_partition].outbound_distance;
             future_weight += (*distance_table)[i][to_partition].inbound_distance;
         }
@@ -42,13 +42,12 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned from_node, const uns
 }
 
 /*
- * Weight retrieval function calculating new weight created by travelling an edge starting at a time.
- * Parameters: IMS::MapGraph * map_graph: graph data
- *             const unsigned & edge
+ * Weight retrieval function calculating realized weight created by travelling an edge starting at a time.
+ * Parameters: const unsigned & edge
  *             const time_t & enter_time
  * Return: w'(e, t) -> expected time needed to finish travelling this edge
  */
-double IMS::Router::retrieve_weight(const unsigned & edge, const time_t & enter_time)
+double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t &enter_time)
 {
     // travel-time w.r.t. current traffic density ONLY
     double occupancy = map_graph->find_current_density(edge, enter_time) / map_graph->max_density;
