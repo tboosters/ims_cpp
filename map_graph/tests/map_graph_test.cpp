@@ -252,6 +252,14 @@ int main()
     assert(mapGraph_square->current_density[3][100] == 2.0 / mapGraph_square->geo_distance[3]);
     assert(mapGraph_square->current_density[3][120] == 0);
 
+    mapGraph_square->remove_impact_of_routed_path(pathEarly0);
+    assert(mapGraph_square->current_density[0].size() == 5);
+    assert(mapGraph_square->current_density[0][0] == 0);
+    assert(mapGraph_square->current_density[0][50] == 0);
+    assert(mapGraph_square->current_density[0][60] == 1.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][70] == 1.0 / mapGraph_square->geo_distance[0]);
+    assert(mapGraph_square->current_density[0][90] == 0);
+
     cout << "==== All Graph Update Test passed ====" << endl;
 
     return 0;

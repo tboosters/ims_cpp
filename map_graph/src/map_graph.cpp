@@ -226,7 +226,30 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
  */
 void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
 {
+    unsigned edge;
+    time_t enter_time, leave_time;
+    double density_delta;
+    auto next_enter_time_edge = path->enter_times.begin();
+    next_enter_time_edge++;
 
+    for (auto &enter_time_edge : path->enter_times)
+    {
+        edge = enter_time_edge.second;
+        enter_time = enter_time_edge.first;
+        leave_time = next_enter_time_edge == path->enter_times.end()? path->end_time : next_enter_time_edge->first;
+        density_delta = 1.0 / geo_distance[edge];
+
+        // When vehicle enters edge
+        current_density[edge][enter_time] -= density_delta;
+
+        // When vehicle is in the edge
+        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first != leave_time; intermediate++)
+        {
+            intermediate->second -= density_delta;
+        }
+
+        next_enter_time_edge++;
+    }
 }
 
 /* Reverse Geocoding */
