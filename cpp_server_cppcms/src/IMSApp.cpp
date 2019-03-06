@@ -41,6 +41,27 @@ cppcms::json::value extract_json_data(pair<void *,size_t> raw_post_data) throw (
     return json_data;
 }
 
+// Util function for building response body with IMS::Path
+cppcms::json::value build_path_response_body(const IMS::Path *path)
+{
+    cppcms::json::value response_body;
+
+    response_body["data"]["start_time"] = path->start_time;
+    response_body["data"]["end_time"] = path->end_time;
+
+    for(int i = 0; i < path->nodes.size(); i++)
+    {
+        response_body["data"]["nodes"][i][0] = path->nodes[i].first;
+        response_body["data"]["nodes"][i][1] = path->nodes[i].second;
+    }
+
+    for(auto & ete : path->enter_times)
+    {
+        response_body["data"]["enter_times"][to_string(ete.first)] = ete.second;
+    }
+    return response_body;
+}
+
 IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentManager *incident_manager) : cppcms::application(srv)
 {
     this->map_graph = map_graph;
@@ -98,34 +119,33 @@ void IMSApp::route()
 
     printf("%f, %f\n%f, %f\n%d, %d", origin_long, origin_lat, destination_long, destination_lat, origin, destination);
 
-//    /* Perform routing */
-//    time_t now = time(nullptr);
-//    IMS::Path * path = router->route(origin, destination, now);
+    /* Perform routing */
+    time_t now = time(nullptr);
+    IMS::Path * path = router->route(origin, destination, now);
+
+    /* Write route to response */
+    cppcms::json::value response_body = build_path_response_body(path);
+    response().out() << response_body;
+
+    /* Perform graph update */
+    map_graph->inject_impact_of_routed_path(path);
+
+//    /* Load sample_route.json */
+//    ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
+//    cppcms::json::value all_routes;
+//    all_routes.load(sample_route_data, true);
+//    sample_route_data.close();
+//
+//    /* Randomly pick a route */
+//    random_device rd;
+//    default_random_engine engine(rd());
+//    uniform_int_distribution<int> uniform_dist(0, 100);
+//    cppcms::json::value route = all_routes[uniform_dist(engine)];
 //
 //    /* Write route to response */
 //    cppcms::json::value response_body;
-//    response_body["data"] = ???;
+//    response_body["data"] = route;
 //    response().out() << response_body;
-//
-//    /* Perform graph update */
-//    map_graph->inject_impact_of_routed_path(path);
-
-    /* Load sample_route.json */
-    ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
-    cppcms::json::value all_routes;
-    all_routes.load(sample_route_data, true);
-    sample_route_data.close();
-
-    /* Randomly pick a route */
-    random_device rd;
-    default_random_engine engine(rd());
-    uniform_int_distribution<int> uniform_dist(0, 100);
-    cppcms::json::value route = all_routes[uniform_dist(engine)];
-
-    /* Write route to response */
-    cppcms::json::value response_body;
-    response_body["data"] = route;
-    response().out() << response_body;
 }
 
 void IMSApp::inject_incident()
