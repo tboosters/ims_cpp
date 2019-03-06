@@ -31,7 +31,7 @@ namespace IMS
         time_t start_time;
         time_t end_time;
         map<time_t, unsigned> enter_times; // <enter_time, edge ID>
-        vector<double[2]> nodes; // [[long, lat]]
+        vector<pair<double, double>> nodes; // (long, lat)
     };
 
     struct InversedGraph
