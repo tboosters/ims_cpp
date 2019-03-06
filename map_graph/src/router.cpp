@@ -78,7 +78,6 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
     vector<unsigned> dist(map_graph->first_out.size(), INFINITY);
     vector<unsigned> prev(map_graph->first_out.size(), INFINITY); // infinity defined as nil here
     priority_queue<pair<unsigned, pair<unsigned, time_t>>, vector<pair<unsigned, pair<unsigned, time_t>>>, greater<pair<unsigned, pair<unsigned, time_t>>>> open;
-    //set<unsigned> closed;
 
     open.push(make_pair(0, make_pair(origin, start_time)));
     dist[origin] = 0;
@@ -89,18 +88,20 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
         unsigned current_node = open.top().second.first;
         time_t current_node_time = open.top().second.second;
         open.pop();
-        
+
         // premature end the graph search if target reached
         if (current_node == destination)
         {
             // reverse path
             stack<unsigned> node_stack;
             unsigned node = destination;
+
             while (node != origin)
             {
                 node_stack.push(node);
                 node = prev[node];
             }
+            node_stack.push(origin);
 
             // retreve information
             IMS::Path* path = new IMS::Path();
@@ -111,6 +112,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             {
                 unsigned this_node = node_stack.top();
                 node_stack.pop();
+                //cout << "[" << this_node << "] -> ";
                 unsigned next_node = node_stack.top();
                 unsigned edge = map_graph->find_edge(this_node, next_node);
 
@@ -120,13 +122,16 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 time = time + retrieve_realized_weight(edge, time);
             }
             path->end_time = time;
+            path->nodes.push_back(make_pair(map_graph->longitude[destination], map_graph->latitude[destination]));
+            //cout << node_stack.top() << "|" << endl;
 
             return path;
         }
+  
 
         // expand neighbours
         unsigned first_edge = map_graph->first_out[current_node];
-        unsigned last_edge = (current_node == map_graph->first_out.size() -1) ? (map_graph->head.size()) : map_graph->first_out[current_node + 1];
+        unsigned last_edge = (current_node == map_graph->first_out.size() -1) ? (map_graph->head.size()) : map_graph->first_out[current_node + 1];;
         for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
         {
             unsigned next_node = map_graph->head[current_edge];
@@ -144,7 +149,5 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
         }
     }
 
-
-    IMS::Path* path = new IMS::Path();
-    return path;
+    return NULL;
 }
