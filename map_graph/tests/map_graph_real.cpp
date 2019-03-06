@@ -41,6 +41,7 @@ int main()
     IMS::Partition::index_partition(p);
     IMS::Partition::layer_t* l = IMS::Partition::build_layer(p, nodes.size());
     */
+   /*
     graph->partition(k, lvl);
 
     now = chrono::system_clock::to_time_t(chrono::system_clock::now());
@@ -51,6 +52,7 @@ int main()
 
     now = chrono::system_clock::to_time_t(chrono::system_clock::now());
     cout << "Preprocessing completed @ \t" << ctime(&now);
+    */
     
     auto end_time = chrono::system_clock::now();
     auto elapsed_seconds = end_time - start_time;

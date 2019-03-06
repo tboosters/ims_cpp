@@ -238,6 +238,7 @@ distance_table_t* IMS::Preprocess::do_preprocess
             // find distance to and from the bound borde
             (*distance_table)[curr->layer][curr->id].outbound_distance = nodeset_shortest_destance(head, first_out, default_travel_time, curr->boundary_outwards ,curr->parent_partition->boundary_outwards);
             (*distance_table)[curr->layer][curr->id].inbound_distance = nodeset_shortest_destance(head, first_out, default_travel_time, curr->parent_partition->boundary_inwards, curr->boundary_inwards);
+            cout << "Added distance table for partition " << curr->id << " at level " << curr->layer << "." << endl;
 
             // remove temp node and vertex
             // -- due to implementation, nothing need to be done
