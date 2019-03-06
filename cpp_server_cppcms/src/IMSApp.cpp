@@ -108,7 +108,7 @@ void IMSApp::route()
 //    response().out() << response_body;
 //
 //    /* Perform graph update */
-//    map_graph->update_with_routed_path(path);
+//    map_graph->inject_impact_of_routed_path(path);
 
     /* Load sample_route.json */
     ifstream sample_route_data(get_exec_dir() + "/sample_route.json");

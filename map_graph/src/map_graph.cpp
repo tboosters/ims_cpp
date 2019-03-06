@@ -170,7 +170,13 @@ double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
 }
 
 /* Updating */
-void IMS::MapGraph::update_with_routed_path(IMS::Path * path)
+
+/* Inject the increased density information to each edge involved in the specified path.
+ * Done according to when the vehicle enters and leaves the edge.
+ * Parameter(s): IMS::Path * path
+ * Returns: when update is done.
+ */
+void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
 {
     unsigned edge;
     time_t enter_time, leave_time;
@@ -212,6 +218,15 @@ void IMS::MapGraph::update_with_routed_path(IMS::Path * path)
 
         next_enter_time_edge++;
     }
+}
+
+/* Remove the impact on density brought by the specified path from each edge involved.
+ * Parameter(s): IMS::Path * path
+ * Returns: when update is done.
+ */
+void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
+{
+
 }
 
 /* Reverse Geocoding */

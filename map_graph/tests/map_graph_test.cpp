@@ -203,7 +203,7 @@ int main()
     cout << "==== Graph Update Test ====" << endl;
 
     // Case: Empty density cache, i.e. no previous vehicles
-    mapGraph_square->update_with_routed_path(path1);
+    mapGraph_square->inject_impact_of_routed_path(path1);
     // Path1 - edge 0
     assert(mapGraph_square->current_density[0].size() == 3);
     assert(mapGraph_square->current_density[0][0] == 0);
@@ -222,7 +222,7 @@ int main()
 
     // Case: Another vehicle comes earlier and leaves earlier.
     // Note: Impossible for other vehicles to come earlier and leave later.
-    mapGraph_square->update_with_routed_path(pathEarly0);
+    mapGraph_square->inject_impact_of_routed_path(pathEarly0);
     assert(mapGraph_square->current_density[0].size() == 5);
     assert(mapGraph_square->current_density[0][0] == 0);
     assert(mapGraph_square->current_density[0][50] == 1.0 / mapGraph_square->geo_distance[0]);
@@ -232,7 +232,7 @@ int main()
 
     // Case: Another vehicle comes later and leaves later
     // Note: Impossible for other vehicles to come later and leave earlier.
-    mapGraph_square->update_with_routed_path(pathLate1);
+    mapGraph_square->inject_impact_of_routed_path(pathLate1);
     assert(mapGraph_square->current_density[1].size() == 5);
     assert(mapGraph_square->current_density[1][0] == 0);
     assert(mapGraph_square->current_density[1][90] == 1.0 / mapGraph_square->geo_distance[1]);
@@ -241,7 +241,7 @@ int main()
     assert(mapGraph_square->current_density[1][110] == 0);
 
     // Case: Another vehicle comes and leaves at existing critical time
-    mapGraph_square->update_with_routed_path(pathSame3);
+    mapGraph_square->inject_impact_of_routed_path(pathSame3);
     assert(mapGraph_square->current_density[3].size() == 3);
     assert(mapGraph_square->current_density[3][0] == 0);
     assert(mapGraph_square->current_density[3][100] == 2.0 / mapGraph_square->geo_distance[3]);

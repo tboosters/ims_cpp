@@ -95,7 +95,8 @@ namespace IMS
         double find_current_density(unsigned edge, time_t enter_time);
 
         /* Updating */
-        void update_with_routed_path(IMS::Path * path);
+        void inject_impact_of_routed_path(IMS::Path * path);
+        void remove_impact_of_routed_path(IMS::Path * path);
 
         /* Reverse Geocoding */
         vector<unsigned int> find_nearest_edge_of_location(const float &longi, const float &lat, const float &offset);
