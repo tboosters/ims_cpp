@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 add_executable(cpp_server_cppcms src/main.cpp src/IMSApp.cpp src/IMSApp.h src/utils.cpp src/utils.h)
 target_link_libraries(cpp_server_cppcms ims::map_graph)
 target_link_libraries(cpp_server_cppcms ims::incident_manager)
+target_link_libraries(cpp_server_cppcms ims::router)
 
 # Dependencies
 # Booster

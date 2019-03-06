@@ -14,6 +14,7 @@
 #include "IMSApp.h"
 #include "ims/map_graph.h"
 #include "ims/incident_manager.h"
+#include "ims/router.h"
 
 
 using namespace std;
