@@ -147,6 +147,11 @@ int main()
     mapGraph_square->default_travel_time.assign(default_travel_time4, default_travel_time4 + 5);
     mapGraph_square->initialize();
 
+    /* Miscellaneous tests */
+    cout << "==== Miscellaneous test ====" << endl;
+    assert(mapGraph_square->find_edge(0, 1) == 1);
+    assert(mapGraph_square->find_edge(0, 3) == (unsigned)INFINITY);
+
     /* Routing tests */
     cout << "==== Reverse Geocoding Test ====" << endl;
     // Find current density

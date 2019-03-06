@@ -91,7 +91,7 @@ namespace IMS
         void preprocess();
 
         /* Routing */
-        unsigned find_edge(unsigned &from, unsigned &to);
+        unsigned find_edge(const unsigned &from, const unsigned &to);
         double find_current_density(unsigned edge, time_t enter_time);
 
         /* Updating */

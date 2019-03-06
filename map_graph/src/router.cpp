@@ -72,15 +72,7 @@ double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t 
 }
 
 IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destination, const time_t &start_time)
-{
-    /*
-    time_t start_time;
-    time_t end_time;
-    map<time_t, unsigned> enter_times; // <enter_time, edge ID>
-    vector<double[2]> nodes; // [[long, lat]]
-    */
-    
-
+{   
     // A* search
     // prepare storage for single source graph search
     vector<unsigned> dist(map_graph->first_out.size(), INFINITY);
@@ -122,8 +114,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 unsigned next_node = node_stack.top();
                 unsigned edge = map_graph->find_edge(this_node, next_node);
 
-                double node_coor[] = {(map_graph->longitude[this_node]), (map_graph->latitude[this_node])}; 
-                //path->nodes.push_back(node_coor);
+                path->nodes.push_back(make_pair(map_graph->longitude[this_node], map_graph->latitude[this_node]));
                 path->enter_times[time] = edge;
 
                 time = time + retrieve_realized_weight(edge, time);

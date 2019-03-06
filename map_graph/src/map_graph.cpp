@@ -137,7 +137,7 @@ void IMS::MapGraph::preprocess()
  *           unsigned &to: to edge
  * Return: unsigned: edge id, INFINITY if no edge exist
  */
-unsigned IMS::MapGraph::find_edge(unsigned &from, unsigned &to)
+unsigned IMS::MapGraph::find_edge(const unsigned &from, const unsigned &to)
 {
     unsigned first_edge = first_out[from];
     unsigned last_edge = (from == first_out.size() -1) ? (head.size()) : first_out[from + 1];
