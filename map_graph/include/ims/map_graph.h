@@ -88,10 +88,10 @@ namespace IMS
 
         /* Pre-processing */
         void partition(const int &k, const int &l);
-
         void preprocess();
 
         /* Routing */
+        unsigned find_edge(unsigned &from, unsigned &to);
         double find_current_density(unsigned edge, time_t enter_time);
 
         /* Updating */

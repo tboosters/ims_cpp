@@ -132,6 +132,25 @@ void IMS::MapGraph::preprocess()
 
 /* Routing */
 
+/* Find the edge id from one node to another.
+ * Paramter: unsigned &from: from edge
+ *           unsigned &to: to edge
+ * Return: unsigned: edge id, INFINITY if no edge exist
+ */
+unsigned IMS::MapGraph::find_edge(unsigned &from, unsigned &to)
+{
+    unsigned first_edge = first_out[from];
+    unsigned last_edge = (from == first_out.size() -1) ? (head.size()) : first_out[from + 1];
+    for (unsigned int current_edge = first_edge; current_edge < last_edge; current_edge ++)
+    {
+        if (head[current_edge] == to)
+        {
+            return current_edge;
+        }
+    }
+    return INFINITY;
+}
+
 /* Find latest effective density: that with time less than or equal to the enter time.
  * Parameters: unsigned edge: edge ID
  *            time_t enter_time

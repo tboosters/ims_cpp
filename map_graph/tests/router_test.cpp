@@ -25,7 +25,7 @@ int main()
     auto incident_manager = new IMS::IncidentManager();
     auto router = new IMS::Router(map_graph, incident_manager);
 
-    cout << router->retrieve_future_weight(0, 3) << endl;
+    //cout << router->retrieve_future_weight(0, 3) << endl;
 
     cout << "==== Router Test ====" << endl;
     // Weight retrieval function

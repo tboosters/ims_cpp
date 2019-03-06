@@ -1,7 +1,7 @@
 /*
  * Header file for routing module.
  * Version: 1.0
- * Author: Terence Chow
+ * Author: Terence Chow & Yuen Hoi Man
  */
 
 #ifndef IMS_CPP_ROUTING_H
@@ -23,10 +23,10 @@ private:
 public:
     Router(IMS::MapGraph * mg, IMS::IncidentManager * im) : map_graph(mg), incident_manager(im) {};
 
-    unsigned retrieve_future_weight(const unsigned from_node, const unsigned to_node);
+    unsigned retrieve_future_weight(const unsigned &from_node, const unsigned &to_node);
     double retrieve_realized_weight(const unsigned &edge, const time_t &enter_time);
 
-    IMS::Path *route(const unsigned &origin, const unsigned &destination, const time_t &start_time);
+    IMS::Path* route(const unsigned &origin, const unsigned &destination, const time_t &start_time);
 
 
 };
