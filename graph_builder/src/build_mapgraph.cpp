@@ -19,25 +19,6 @@ using namespace RoutingKit;
 using namespace IMS;
 
 /*
- * Helper function for populating a MapGraph from a generate OSM graph.
- *
- * Parameters: IMS::MapGraph &graph
- *             const RoutingKit::SimpleOSMCarRoutingGraph &graph_data
- * Return: When MapGraph is populated;
- */
-void populate_map_graph_from_osm_graph(IMS::MapGraph &graph, const RoutingKit::SimpleOSMCarRoutingGraph &graph_data)
-{
-    graph.longitude = graph_data.longitude;
-    graph.latitude = graph_data.latitude;
-    graph.head = graph_data.head;
-    graph.first_out = graph_data.first_out;
-    graph.default_travel_time = graph_data.travel_time;
-    graph.geo_distance = graph_data.geo_distance;
-
-    graph.initialize();
-}
-
-/*
  * Entrance of module from external source.
  * Acts as facet of graph building and serialization function.
  * Prompts user input for PBF file path.
@@ -65,9 +46,16 @@ void build_mapgraph_entrance()
         /* Build graph data structure. */
         cout << "Start building graph..." << endl;
 
-        RoutingKit::SimpleOSMCarRoutingGraph graph_data = simple_load_osm_car_routing_graph_from_pbf(input_file_path);
+        auto graph_data = simple_load_osm_car_routing_graph_from_pbf(input_file_path);
         IMS::MapGraph graph;
-        populate_map_graph_from_osm_graph(graph, graph_data);
+        graph.longitude = graph_data.longitude;
+        graph.latitude = graph_data.latitude;
+        graph.head = graph_data.head;
+        graph.first_out = graph_data.first_out;
+        graph.default_travel_time = graph_data.travel_time;
+        graph.geo_distance = graph_data.geo_distance;
+
+        graph.initialize();
 
         cout << "Graph built." << endl;
         cout << "Number of nodes: " << graph_data.node_count() << endl;

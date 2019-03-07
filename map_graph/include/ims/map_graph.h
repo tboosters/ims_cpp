@@ -66,7 +66,7 @@ namespace IMS
         // Max Density = 1 / avg. car length = 1 / 5
         const double max_density = 0.2;
 
-        /* Initialize dynamic fields: default_speed, current_density */
+        /* Initialize dynamic fields: current_density, inversed, map_geo_location */
         void initialize();
 
         /* Initialize from deserialization */
@@ -131,8 +131,10 @@ void serialize(Archive &archive, IMS::MapGraph &mapGraph, const unsigned int ver
     archive & mapGraph.default_travel_time;
     archive & mapGraph.geo_distance;
 
-    /* Density Information */
-    archive & mapGraph.current_density;
+    /* Preprocessed Data */
+    archive & mapGraph.partitions;
+    archive & mapGraph.layers;
+    archive & mapGraph.distance_tables;
 }
 }
 }

@@ -7,6 +7,8 @@
 #ifndef IMS_CPP_PREPROCESS_H
 #define IMS_CPP_PREPROCESS_H
 
+#include <boost/serialization/map.hpp>
+
 #include <vector>
 #include "partition.h"
 
@@ -28,6 +30,14 @@ struct entry_t
     map<unsigned, unsigned> partition_distance;
     unsigned outbound_distance;
     unsigned inbound_distance;
+
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & partition_distance;
+        archive & outbound_distance;
+        archive & inbound_distance;
+    }
 };
 typedef struct entry_t entry_t;
 

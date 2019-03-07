@@ -19,7 +19,7 @@
 
 using namespace std;
 
-/* Initialize dynamic fields: current_density, inversed
+/* Initialize dynamic fields: current_density, inversed, map_geo_location
  * MUST BE CALLED AFTER CREATING CLASS INSTANCE.
  * Parameter: NIL
  * Return: when the fields are initialized

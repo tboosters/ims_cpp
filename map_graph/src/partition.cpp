@@ -144,7 +144,9 @@ partition_t * IMS::Partition::do_partition
         {
             auto leaf = new IMS::Partition::partition_t;
             leaf->id = nodes[i];
+            leaf->layer = layer + 1;
             leaf->is_node = true;
+            leaf->parent_partition = p;
             leaves[i] = leaf;
         }
 
