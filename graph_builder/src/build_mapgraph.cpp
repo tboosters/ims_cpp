@@ -64,11 +64,8 @@ void build_mapgraph_entrance()
         cout << endl;
 
         /* Perform Partitioning and Pre-processing */
-        cout << "Partitioning..." << endl;
-        graph.partition(k, l);
-
-        cout << "Pre-processing..." << endl;
-        graph.preprocess();
+        cout << "Partitioning and Pre-processing..." << endl;
+        graph.preprocess(k, l);
 
         /* Serialize created graph */
         cout << "Start serializing graph..." << endl;

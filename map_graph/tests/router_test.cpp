@@ -19,8 +19,7 @@ int main()
     map_graph->default_travel_time.assign(default_travel_time4, default_travel_time4 + 5);
     map_graph->initialize();
     map_graph->current_density[1][100] = 0.1;
-    map_graph->partition(2, 3);
-    map_graph->preprocess();
+    map_graph->preprocess(2, 3);
 
     auto incident_manager = new IMS::IncidentManager();
     auto router = new IMS::Router(map_graph, incident_manager);
@@ -46,8 +45,7 @@ int main()
     map_graph2->default_travel_time.assign(default_travel_time16, default_travel_time16 + 30);
     map_graph2->initialize();
     map_graph2->current_density[1][100] = 0.1;
-    map_graph2->partition(2, 3);
-    map_graph2->preprocess();
+    map_graph2->preprocess(2, 3);
 
     auto incident_manager2 = new IMS::IncidentManager();
     auto router2 = new IMS::Router(map_graph2, incident_manager2);

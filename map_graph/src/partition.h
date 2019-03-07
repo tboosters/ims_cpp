@@ -37,18 +37,6 @@ struct partition_t
     vector<unsigned> boundary_inwards;
     partition_t* parent_partition;
     vector<partition_t*> sub_partition;
-
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & id;
-        archive & layer;
-        archive & is_node;
-        archive & boundary_outwards;
-        archive & boundary_inwards;
-        archive & parent_partition;
-        archive & sub_partition;
-    }
 };
 typedef struct partition_t partition_t;
 

@@ -48,7 +48,7 @@ void compare_serialized_graph()
     try
     {
         cout << "Deserializing actual HK.graph..." << endl;
-        auto actual = IMS::MapGraph::deserialize(actual_file_path);
+        auto actual = IMS::MapGraph::deserialize_and_initialize(actual_file_path);
 
         cout << "Creating expected graph..." << endl;
         RoutingKit::SimpleOSMCarRoutingGraph expected = simple_load_osm_car_routing_graph_from_pbf(original_pbf_path);

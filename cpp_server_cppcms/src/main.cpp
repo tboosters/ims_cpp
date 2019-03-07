@@ -41,8 +41,7 @@ int main(int argc, char ** argv)
     try
     {
         cout << "Initializing MapGraph..." << endl;
-        auto map_graph = IMS::MapGraph::deserialize(map_file_path);
-        map_graph->initialize();
+        auto map_graph = IMS::MapGraph::deserialize_and_initialize(map_file_path);
         auto incident_manager = new IMS::IncidentManager();
 
         cppcms::service srv(argc, argv);

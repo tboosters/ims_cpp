@@ -56,7 +56,6 @@ namespace IMS
         RoutingKit::GeoPositionToNode map_geo_position; // Reversed geocoding index
 
         // Preprocessed data
-        IMS::Partition::partition_t* partitions;
         IMS::Partition::layer_t* layers;
         IMS::Preprocess::distance_table_t* distance_tables;
 
@@ -70,13 +69,16 @@ namespace IMS
         void initialize();
 
         /* Initialize from deserialization */
-        static MapGraph * deserialize(const string& input_file_path)
+        static MapGraph * deserialize_and_initialize(const string &input_file_path)
         {
             auto graph = new MapGraph();
             ifstream ifs(input_file_path);
             boost::archive::text_iarchive input_archive_stream(ifs);
             input_archive_stream >> *graph;
             ifs.close();
+            
+            graph->initialize();
+            
             return graph;
         }
 
@@ -87,8 +89,7 @@ namespace IMS
         InversedGraph* inverse();
 
         /* Pre-processing */
-        void partition(const int &k, const int &l);
-        void preprocess();
+        void preprocess(const unsigned &k, const unsigned &l);
 
         /* Routing */
         unsigned find_edge(const unsigned &from, const unsigned &to);
@@ -132,7 +133,6 @@ void serialize(Archive &archive, IMS::MapGraph &mapGraph, const unsigned int ver
     archive & mapGraph.geo_distance;
 
     /* Preprocessed Data */
-    archive & mapGraph.partitions;
     archive & mapGraph.layers;
     archive & mapGraph.distance_tables;
 }

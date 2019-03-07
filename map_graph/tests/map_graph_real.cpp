@@ -15,8 +15,7 @@ int main()
     auto now = chrono::system_clock::to_time_t(chrono::system_clock::now());
     cout << "Start program @ \t" << ctime(&now);
 
-    auto graph = IMS::MapGraph::deserialize("HK.graph");
-    graph->initialize();
+    auto graph = IMS::MapGraph::deserialize_and_initialize("HK.graph");
 
     return 0; 
 
