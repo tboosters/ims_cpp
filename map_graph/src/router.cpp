@@ -63,7 +63,7 @@ double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t 
 {
     // travel-time w.r.t. current traffic density ONLY
     double occupancy = map_graph->find_current_density(edge, enter_time) / map_graph->max_density;
-    double basic_weight = map_graph->default_travel_time[edge] / (1 - occupancy);
+    double basic_weight = map_graph->default_travel_time[edge] / 1000 / (1 - occupancy);
 
     // a(e): incident detection
     double time_dependent_modifier = incident_manager->get_total_incident_impact(edge);

@@ -19,6 +19,17 @@
 
 using namespace std;
 
+/* Destructor for releasing dynamic memory allocated to MapGraph.
+ * Parameter(s): NIL
+ * Return: when memory is released.
+ */
+IMS::MapGraph::~MapGraph()
+{
+    delete inversed;
+    delete layers;
+    delete distance_tables;
+}
+
 /* Initialize dynamic fields: current_density, inversed, map_geo_location
  * MUST BE CALLED AFTER CREATING CLASS INSTANCE.
  * Parameter: NIL
@@ -108,7 +119,7 @@ void IMS::MapGraph::preprocess(const unsigned &k, const unsigned &l)
 
     // Partition
     IMS::Partition::partition_t* partitions = IMS::Partition::do_partition(
-            nodes, this->latitude , this->longitude, 
+            nodes, this->latitude , this->longitude,
             this->head, this->first_out, this->inversed->head, this->inversed->first_out,
             k, l, 0);
     IMS::Partition::index_partition(partitions);
@@ -116,16 +127,16 @@ void IMS::MapGraph::preprocess(const unsigned &k, const unsigned &l)
 
     // Preprocessing
     auto distance_tables = IMS::Preprocess::do_preprocess(
-            nodes, 
+            nodes,
             this->head, this->first_out, this->default_travel_time,
             partitions, layers);
     
     // save information
     this->layers = layers;
     this->distance_tables = distance_tables;
-    
+
     // Release memory
-    IMS::Partition::delete_partition(partitions);
+    delete partitions;
 }
 
 /* Routing */

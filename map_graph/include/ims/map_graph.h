@@ -65,6 +65,9 @@ namespace IMS
         // Max Density = 1 / avg. car length = 1 / 5
         const double max_density = 0.2;
 
+        /* Destructor */
+        ~MapGraph();
+
         /* Initialize dynamic fields: current_density, inversed, map_geo_location */
         void initialize();
 
@@ -76,9 +79,9 @@ namespace IMS
             boost::archive::text_iarchive input_archive_stream(ifs);
             input_archive_stream >> *graph;
             ifs.close();
-            
+
             graph->initialize();
-            
+
             return graph;
         }
 

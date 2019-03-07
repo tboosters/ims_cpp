@@ -100,7 +100,8 @@ int main()
     cout << IMS::Partition::find_parent(layer, 4); // expected: 4 for N=12, k=2, l=3
     cout << endl;
 
-    //IMS::Partition::delete_partition(p);
+    delete p;
+    delete layer;
 
     /* Preprocess tests */
     cout << "==== Preprocess Test ====" << endl;
@@ -234,7 +235,15 @@ int main()
     assert(mapGraph_square->current_density[0][70] == 1.0 / mapGraph_square->geo_distance[0]);
     assert(mapGraph_square->current_density[0][90] == 0);
 
+    delete path1;
+    delete pathEarly0;
+    delete pathLate1;
+    delete pathSame3;
+
     cout << "==== All Graph Update Test passed ====" << endl;
+
+    delete mapGraph;
+    delete mapGraph_square;
 
     return 0;
 }

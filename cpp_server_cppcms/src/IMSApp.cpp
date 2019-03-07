@@ -74,6 +74,7 @@ IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentMana
 
     // Add url dispatchers
     dispatcher().map("POST", "/route", &IMSApp::route, this);
+    dispatcher().map("POST", "/reroute", &IMSApp::reroute, this);
     dispatcher().map("POST", "/incident", &IMSApp::inject_incident, this);
     dispatcher().map("DELETE", "/incident", &IMSApp::remove_incident, this);
 }
@@ -105,16 +106,16 @@ void IMSApp::route()
     double destination_lat = json_data["coordinates"][1][1].number();
 
     /* Reverse Geocoding for origin and destination */
-    unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, 500);
-    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, 500);
+    unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, RADIUS);
+    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, RADIUS);
     if(origin == RoutingKit::invalid_id)
     {
-        response().make_error_response(400, "No node within 500m from origin position.");
+        response().make_error_response(400, "No node within " + to_string(RADIUS) + "m from origin position.");
         return;
     }
     if(destination == RoutingKit::invalid_id)
     {
-        response().make_error_response(400, "No node within 500m from destination position.");
+        response().make_error_response(400, "No node within " + to_string(RADIUS) + "m from destination position.");
         return;
     }
 
@@ -128,25 +129,97 @@ void IMSApp::route()
     cppcms::json::value response_body = build_path_response_body(path);
     response().out() << response_body;
 
+    cout << endl << "==== Route ====" << endl;
+    cout.precision(10);
+    for(auto & n : path->nodes)
+    {
+        cout << n.second << ", " << n.first << endl;
+    }
+    printf("Time needed: %.2f minutes\n", (path->end_time - path->start_time) / 60.0);
+    cout << "===============" << endl;
+
     /* Perform graph update */
     map_graph->inject_impact_of_routed_path(path);
 
-//    /* Load sample_route.json */
-//    ifstream sample_route_data(get_exec_dir() + "/sample_route.json");
-//    cppcms::json::value all_routes;
-//    all_routes.load(sample_route_data, true);
-//    sample_route_data.close();
-//
-//    /* Randomly pick a route */
-//    random_device rd;
-//    default_random_engine engine(rd());
-//    uniform_int_distribution<int> uniform_dist(0, 100);
-//    cppcms::json::value route = all_routes[uniform_dist(engine)];
-//
-//    /* Write route to response */
-//    cppcms::json::value response_body;
-//    response_body["data"] = route;
-//    response().out() << response_body;
+    /* Release memory */
+    delete path;
+}
+
+void IMSApp::reroute()
+{
+    /* Take POST JSON body */
+    cppcms::json::value json_data;
+    try
+    {
+        json_data = extract_json_data(request().raw_post_data());
+    }
+    catch (booster::invalid_argument & e)
+    {
+        response().make_error_response(400, e.what());
+        return;
+    }
+
+    double current_long = json_data["coordinates"][0][0].number();
+    double current_lat = json_data["coordinates"][0][1].number();
+    double destination_long = json_data["coordinates"][1][0].number();
+    double destination_lat = json_data["coordinates"][1][1].number();
+
+    auto old_path = new IMS::Path();
+    old_path->start_time = (time_t) json_data["start_time"].number();
+    old_path->end_time = (time_t) json_data["end_time"].number();
+
+    for(auto & coordinates : json_data["nodes"].array())
+    {
+        old_path->nodes.emplace_back(coordinates[0].number(), coordinates[1].number());
+    }
+
+    for(auto & ete : json_data["enter_times"].object())
+    {
+        old_path->enter_times[stol(ete.first)] = (unsigned) ete.second.number();
+    }
+
+    /* Remove old path from graph's density information */
+    map_graph->remove_impact_of_routed_path(old_path);
+
+    /* Reroute from current location */
+    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, RADIUS);
+
+    unsigned current_origin = map_graph->find_nearest_node_of_location(current_long, current_lat, RADIUS);
+    if(current_origin == RoutingKit::invalid_id)
+    {
+        response().make_error_response(400, "No node within " + to_string(RADIUS) + "m from current position.");
+        return;
+    }
+
+    time_t now = time(nullptr);
+    auto new_path = router->route(current_origin, destination, now);
+
+    /* Determine the better path: if new path reaches destination earlier than old path for at least "threshold" time */
+    IMS::Path * better_path = old_path;
+    time_t threshold = 10 * 60;
+    if(new_path->end_time - old_path->end_time >= threshold)
+    {
+        better_path = new_path;
+    }
+
+    /* Write route to response */
+    cppcms::json::value response_body = build_path_response_body(better_path);
+    response().out() << response_body;
+
+    cout << endl << "==== Route ====" << endl;
+    for(auto & n : better_path->nodes)
+    {
+        cout << n.second << ", " << n.first << endl;
+    }
+    printf("Time needed: %.2f minutes\n", (better_path->end_time - better_path->start_time) / 60.0);
+    cout << "===============" << endl;
+
+    /* Perform graph update */
+    map_graph->inject_impact_of_routed_path(better_path);
+
+    /* Release memory */
+    delete old_path;
+    delete new_path;
 }
 
 void IMSApp::inject_incident()
@@ -169,11 +242,10 @@ void IMSApp::inject_incident()
 
     /* Reverse Geocoding for affected edge */
     /* OFFSET OF NEAREST_EDGE = 0.002 for accuracy of result */
-    const float offset = 0.002;
-    vector<unsigned> affected_edges = map_graph->find_nearest_edge_of_location(incident_long, incident_lat, offset);
+    vector<unsigned> affected_edges = map_graph->find_nearest_edge_of_location(incident_long, incident_lat, OFFSET);
     if(affected_edges.empty())
     {
-        response().make_error_response(404, "Incident location not on any road");
+        response().make_error_response(400, "Incident location not on any road");
         return;
     }
 
@@ -209,7 +281,7 @@ void IMSApp::remove_incident()
     unsigned num_of_incident_removed = incident_manager->remove_incident(incident_id);
     if(num_of_incident_removed == 0)
     {
-        response().make_error_response(404, "Incident not found");
+        response().make_error_response(400, "Incident not found");
         return;
     }
 

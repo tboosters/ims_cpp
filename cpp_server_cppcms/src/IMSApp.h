@@ -27,14 +27,17 @@ namespace IMS
         IMS::IncidentManager *incident_manager;
         IMS::Router *router;
 
+        const float RADIUS = 100;
+        const float OFFSET = 0.002;
+
         // Dev url for checking graph
         void check_graph();
 
         // Routed controller functions
         void route();
+        void reroute();
         void inject_incident();
         void remove_incident();
-        void handle_graph_update();
     };
 
 }
