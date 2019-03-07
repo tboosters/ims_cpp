@@ -37,6 +37,14 @@ struct partition_t
     vector<unsigned> boundary_inwards;
     partition_t* parent_partition;
     vector<partition_t*> sub_partition;
+
+    ~partition_t()
+    {
+        for(auto sp : sub_partition)
+        {
+            delete sp;
+        }
+    }
 };
 typedef struct partition_t partition_t;
 
