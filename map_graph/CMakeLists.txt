@@ -34,7 +34,7 @@ target_link_libraries(router_test ims::router)
 find_path(Boost_INCLUDE_DIRS boost/align.hpp)
 find_library(Boost_LIBRARIES libboost_thread.so)
 include_directories("${Boost_INCLUDE_DIRS}")
-target_link_libraries(map_graph ${Boost_LIBRARIES} boost_thread)
+target_link_libraries(map_graph ${Boost_LIBRARIES} boost_serialization boost_thread)
 target_link_libraries(incident_manager ${Boost_LIBRARIES} boost_thread)
 
 

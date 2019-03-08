@@ -12,9 +12,9 @@ target_link_libraries(cpp_server_cppcms ims::router)
 
 # Dependencies
 find_path(Boost_INCLUDE_DIRS boost/align.hpp)
-find_library(Boost_LIBRARIES libboost_thread.so)
+find_library(Boost_LIBRARIES libboost_serialization.so)
 include_directories("${Boost_INCLUDE_DIRS}")
-target_link_libraries(cpp_server_cppcms ${Boost_LIBRARIES})
+target_link_libraries(cpp_server_cppcms ${Boost_LIBRARIES} boost_serialization)
 
 # Booster
 find_path(Booster_INCLUDE_DIRS booster/config.h)
