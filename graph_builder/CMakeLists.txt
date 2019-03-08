@@ -9,6 +9,12 @@ add_executable(graph_builder src/main.cpp src/build_mapgraph.cpp src/build_mapgr
 # MapGraph and Graph Serializer
 target_link_libraries(graph_builder ims::map_graph)
 
+# Boost
+find_path(Boost_INCLUDE_DIRS boost/align.hpp)
+find_library(Boost_LIBRARIES libboost_thread.so)
+include_directories("${Boost_INCLUDE_DIRS}")
+target_link_libraries(graph_builder ${Boost_LIBRARIES})
+
 # RoutingKit
 find_path(RoutingKit_INCLUDE_DIRS routingkit/all.h)
 find_library(RoutingKit_LIBRARIES libroutingkit.so)
