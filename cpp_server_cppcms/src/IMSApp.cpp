@@ -119,11 +119,12 @@ void IMSApp::route()
         return;
     }
 
-    printf("%f, %f\n%f, %f\n%d, %d", origin_long, origin_lat, destination_long, destination_lat, origin, destination);
-
     /* Perform routing */
     time_t now = time(nullptr);
     IMS::Path * path = router->route(origin, destination, now);
+
+    /* Perform graph update */
+    map_graph->inject_impact_of_routed_path(path);
 
     /* Write route to response */
     cppcms::json::value response_body = build_path_response_body(path);
@@ -137,9 +138,6 @@ void IMSApp::route()
     }
     printf("Time needed: %.2f minutes\n", (path->end_time - path->start_time) / 60.0);
     cout << "===============" << endl;
-
-    /* Perform graph update */
-    map_graph->inject_impact_of_routed_path(path);
 
     /* Release memory */
     delete path;
@@ -202,6 +200,9 @@ void IMSApp::reroute()
         better_path = new_path;
     }
 
+    /* Perform graph update */
+    map_graph->inject_impact_of_routed_path(better_path);
+
     /* Write route to response */
     cppcms::json::value response_body = build_path_response_body(better_path);
     response().out() << response_body;
@@ -213,9 +214,6 @@ void IMSApp::reroute()
     }
     printf("Time needed: %.2f minutes\n", (better_path->end_time - better_path->start_time) / 60.0);
     cout << "===============" << endl;
-
-    /* Perform graph update */
-    map_graph->inject_impact_of_routed_path(better_path);
 
     /* Release memory */
     delete old_path;

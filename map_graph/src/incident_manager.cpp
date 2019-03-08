@@ -70,6 +70,11 @@ unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
  */
 double IMS::IncidentManager::get_total_incident_impact(unsigned edge_id)
 {
+    if(affected_roads.count(edge_id) == 0)
+    {
+        return 0;
+    }
+
     double total_incident_impact = 0;
     for(auto & incident : affected_roads[edge_id])
     {

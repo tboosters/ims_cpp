@@ -63,6 +63,11 @@ double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t 
 {
     // travel-time w.r.t. current traffic density ONLY
     double occupancy = map_graph->find_current_density(edge, enter_time) / map_graph->max_density;
+    if(occupancy >= 1)
+    {
+        return INFINITY;
+    }
+
     double basic_weight = map_graph->default_travel_time[edge] / (1 - occupancy);
 
     // a(e): incident detection
@@ -79,7 +84,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
     vector<unsigned> prev(map_graph->first_out.size(), INFINITY); // infinity defined as nil here
     priority_queue<pair<unsigned, pair<unsigned, time_t>>, vector<pair<unsigned, pair<unsigned, time_t>>>, greater<pair<unsigned, pair<unsigned, time_t>>>> open;
 
-    open.push(make_pair(0, make_pair(origin, start_time)));
+    open.push(make_pair(0, make_pair(origin, start_time * 1000))); // Covert start_time to millisecond
     dist[origin] = 0;
 
     // process the node u with minimum dist[u]
@@ -119,7 +124,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 path->nodes.push_back(make_pair(map_graph->longitude[this_node], map_graph->latitude[this_node]));
                 path->enter_times[time] = edge;
 
-                time = time + retrieve_realized_weight(edge, time) / 1000.0;
+                time = time + retrieve_realized_weight(edge, time) / 1000;
             }
             path->end_time = time;
             path->nodes.push_back(make_pair(map_graph->longitude[destination], map_graph->latitude[destination]));
@@ -137,7 +142,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             unsigned next_node = map_graph->head[current_edge];
             unsigned g = dist[current_node];
             unsigned h = retrieve_future_weight(next_node, destination);
-            unsigned w = retrieve_realized_weight(current_edge, current_node_time);
+            double w = retrieve_realized_weight(current_edge, current_node_time);
 
             unsigned f = g + h + w;
             if (dist[next_node] > f)

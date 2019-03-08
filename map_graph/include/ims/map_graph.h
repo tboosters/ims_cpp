@@ -44,7 +44,7 @@ namespace IMS
     class MapGraph
     {
     public:
-        /* TODO: Add preprocessed data - layers, distance matrix */
+
 
         vector<float> latitude;
         vector<float> longitude;
