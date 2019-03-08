@@ -13,6 +13,8 @@
 #include <string>
 #include <map>
 
+#include <boost/thread/thread.hpp>
+#include <boost/thread/shared_mutex.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/vector.hpp>
@@ -43,9 +45,10 @@ namespace IMS
 
     class MapGraph
     {
+    private:
+        boost::shared_mutex access;
+
     public:
-
-
         vector<float> latitude;
         vector<float> longitude;
         vector<unsigned> head;

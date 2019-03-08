@@ -11,7 +11,10 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
+
 #include <routingkit/geo_position_to_node.h>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "../include/ims/map_graph.h"
 //#include "partition.h"
@@ -167,6 +170,9 @@ unsigned IMS::MapGraph::find_edge(const unsigned &from, const unsigned &to)
  * */
 double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
 {
+    // Lock reader access
+    boost::shared_lock<boost::shared_mutex> reader_lock(access);
+
     auto latest_density = current_density[edge].lower_bound(enter_time);
     if(latest_density->first == enter_time)
     {
@@ -187,6 +193,9 @@ double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
  */
 void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
 {
+    // Lock exclusive writer access
+    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+
     unsigned edge;
     time_t enter_time, leave_time;
     double density_delta;
@@ -235,6 +244,9 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
  */
 void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
 {
+    // Lock exclusive writer access
+    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+
     unsigned edge;
     time_t enter_time, leave_time;
     double density_delta;

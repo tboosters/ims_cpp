@@ -23,6 +23,9 @@ using namespace std;
  */
 unsigned IMS::IncidentManager::add_incident(vector<unsigned> affected_edges, unsigned impact)
 {
+    // Lock exclusive writer access
+    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+
     unsigned incident_id = num_of_incident;
     incidents[incident_id] = impact;
     for(auto & edge : affected_edges)
@@ -41,6 +44,9 @@ unsigned IMS::IncidentManager::add_incident(vector<unsigned> affected_edges, uns
  */
 unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
 {
+    // Lock exclusive writer access
+    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+
     unsigned num_of_incidents_removed = incidents.erase(incident_id);
 
     if(num_of_incidents_removed > 0)
@@ -70,6 +76,9 @@ unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
  */
 double IMS::IncidentManager::get_total_incident_impact(unsigned edge_id)
 {
+    // Lock reader access
+    boost::shared_lock<boost::shared_mutex> reader_lock(access);
+
     if(affected_roads.count(edge_id) == 0)
     {
         return 0;

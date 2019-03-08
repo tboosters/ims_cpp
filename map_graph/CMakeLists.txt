@@ -17,6 +17,12 @@ add_executable(router_test tests/router_test.cpp)
 
 target_include_directories(map_graph PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
+# pthread
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(map_graph pthread)
+target_link_libraries(incident_manager pthread)
+
 # Dependencies
 target_link_libraries(router ims::map_graph ims::incident_manager)
 target_link_libraries(map_graph_test ims::map_graph)
@@ -26,9 +32,10 @@ target_link_libraries(router_test ims::router)
 
 # Boost
 find_path(Boost_INCLUDE_DIRS boost/align.hpp)
-find_library(Boost_LIBRARIES libboost_serialization.so)
+find_library(Boost_LIBRARIES libboost_thread.so)
 include_directories("${Boost_INCLUDE_DIRS}")
 target_link_libraries(map_graph ${Boost_LIBRARIES})
+target_link_libraries(incident_manager ${Boost_LIBRARIES} boost_thread)
 
 
 # RoutingKit

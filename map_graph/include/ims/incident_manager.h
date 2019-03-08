@@ -11,6 +11,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include <boost/thread/thread.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
 using namespace std;
 
 namespace IMS
@@ -19,6 +22,7 @@ namespace IMS
 class IncidentManager
 {
 private:
+    boost::shared_mutex access;
     unsigned num_of_incident = 0;
     unordered_map<unsigned, unsigned> incidents;
     unordered_map<unsigned, unordered_set<unsigned> > affected_roads;

@@ -59,13 +59,13 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned &from_node, const un
  *             const time_t & enter_time
  * Return: w'(e, t) -> expected time needed to finish travelling this edge
  */
-double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t &enter_time)
+unsigned int IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t &enter_time)
 {
     // travel-time w.r.t. current traffic density ONLY
     double occupancy = map_graph->find_current_density(edge, enter_time) / map_graph->max_density;
     if(occupancy >= 1)
     {
-        return INFINITY;
+        return JAMMED_WEIGHT;
     }
 
     double basic_weight = map_graph->default_travel_time[edge] / (1 - occupancy);
@@ -77,12 +77,16 @@ double IMS::Router::retrieve_realized_weight(const unsigned &edge, const time_t 
 }
 
 IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destination, const time_t &start_time)
-{   
+{
     // A* search
     // prepare storage for single source graph search
     vector<unsigned> dist(map_graph->first_out.size(), INFINITY);
     vector<unsigned> prev(map_graph->first_out.size(), INFINITY); // infinity defined as nil here
-    priority_queue<pair<unsigned, pair<unsigned, time_t>>, vector<pair<unsigned, pair<unsigned, time_t>>>, greater<pair<unsigned, pair<unsigned, time_t>>>> open;
+    priority_queue<
+            pair<unsigned, pair<unsigned, time_t>>,
+            vector<pair<unsigned, pair<unsigned, time_t>>>,
+            greater<pair<unsigned, pair<unsigned, time_t>>>
+            > open;
 
     open.push(make_pair(0, make_pair(origin, start_time * 1000))); // Covert start_time to millisecond
     dist[origin] = 0;
@@ -121,13 +125,13 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 unsigned next_node = node_stack.top();
                 unsigned edge = map_graph->find_edge(this_node, next_node);
 
-                path->nodes.push_back(make_pair(map_graph->longitude[this_node], map_graph->latitude[this_node]));
+                path->nodes.emplace_back(map_graph->longitude[this_node], map_graph->latitude[this_node]);
                 path->enter_times[time] = edge;
 
-                time = time + retrieve_realized_weight(edge, time) / 1000;
+                time = time + retrieve_realized_weight(edge, time);
             }
             path->end_time = time;
-            path->nodes.push_back(make_pair(map_graph->longitude[destination], map_graph->latitude[destination]));
+            path->nodes.emplace_back(map_graph->longitude[destination], map_graph->latitude[destination]);
             //cout << node_stack.top() << "|" << endl;
 
             return path;
@@ -142,7 +146,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             unsigned next_node = map_graph->head[current_edge];
             unsigned g = dist[current_node];
             unsigned h = retrieve_future_weight(next_node, destination);
-            double w = retrieve_realized_weight(current_edge, current_node_time);
+            unsigned w = retrieve_realized_weight(current_edge, current_node_time);
 
             unsigned f = g + h + w;
             if (dist[next_node] > f)

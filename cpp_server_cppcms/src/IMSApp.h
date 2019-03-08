@@ -23,6 +23,8 @@ namespace IMS
         IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentManager *incident_manager);
 
     private:
+        static boost::mutex atomic_lock;
+
         IMS::MapGraph *map_graph;
         IMS::IncidentManager *incident_manager;
         IMS::Router *router;

@@ -32,7 +32,7 @@ echo "Installing Boost..."
 wget https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.bz2
 tar --bzip2 -xf boost_1_69_0.tar.bz2
 cd boost_1_69_0
-./bootstrap.sh --with-libraries=serialization
+./bootstrap.sh --with-libraries=serialization,thread
 if [ $? -eq 0 ]
 then
 	./b2 install
