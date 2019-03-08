@@ -73,7 +73,7 @@ unsigned int IMS::Router::retrieve_realized_weight(const unsigned &edge, const t
     // a(e): incident detection
     double time_dependent_modifier = incident_manager->get_total_incident_impact(edge);
 
-    return basic_weight + time_dependent_modifier;
+    return round(basic_weight + time_dependent_modifier);
 }
 
 IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destination, const time_t &start_time)
@@ -114,8 +114,8 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
 
             // retreve information
             IMS::Path* path = new IMS::Path();
-            path->start_time = start_time;
-            time_t time = start_time;
+            path->start_time = start_time * 1000;
+            time_t time = start_time * 1000;
 
             while (node_stack.size() != 1)
             {
