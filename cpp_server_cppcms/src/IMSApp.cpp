@@ -195,9 +195,10 @@ void IMSApp::reroute()
     auto new_path = router->route(current_origin, destination, now);
 
     /* Determine the better path: if new path reaches destination earlier than old path for at least "threshold" time */
+    // TODO: Remove decision making -> old path should always be disposed as it no longer reflect latest information.
     IMS::Path * better_path = old_path;
-    time_t threshold = 10 * 60;
-    if(new_path->end_time - old_path->end_time >= threshold)
+    time_t threshold = 10 * 60 * 1000;
+    if(old_path->end_time - new_path->end_time >= threshold)
     {
         better_path = new_path;
     }
