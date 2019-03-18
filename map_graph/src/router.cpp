@@ -76,7 +76,7 @@ unsigned int IMS::Router::retrieve_realized_weight(const unsigned &edge, const t
     return round(basic_weight + time_dependent_modifier);
 }
 
-IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destination, const time_t &start_time)
+IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destination, const time_t &start_time,  ExpandedLog* log)
 {
     // A* search
     // prepare storage for single source graph search
@@ -154,6 +154,14 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 dist[next_node] = f;
                 prev[next_node] = current_node;
                 open.push(make_pair(dist[next_node], make_pair(next_node, current_node_time + w)));
+            }
+
+            // log the search space if appicable
+            if (log != NULL)
+            {
+                log->expanded_nodes[current_node] = make_pair(map_graph->latitude[current_node], map_graph->longitude[current_node]);
+                log->expanded_nodes[next_node] = make_pair(map_graph->latitude[next_node], map_graph->longitude[next_node]);
+                log->expanded_edges.emplace_back(current_node, next_node);
             }
         }
     }

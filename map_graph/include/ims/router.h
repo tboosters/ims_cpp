@@ -11,6 +11,7 @@
 #include <ctime>
 #include "map_graph.h"
 #include "incident_manager.h"
+#include "exp_log.h"
 
 namespace IMS
 {
@@ -27,9 +28,7 @@ public:
     unsigned retrieve_future_weight(const unsigned &from_node, const unsigned &to_node);
     unsigned int retrieve_realized_weight(const unsigned &edge, const time_t &enter_time);
 
-    IMS::Path* route(const unsigned &origin, const unsigned &destination, const time_t &start_time);
-
-
+    IMS::Path* route(const unsigned &origin, const unsigned &destination, const time_t &start_time, ExpandedLog* log = NULL);
 };
 }
 

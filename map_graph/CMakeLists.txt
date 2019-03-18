@@ -15,7 +15,7 @@ add_executable(map_graph_real tests/map_graph_real.cpp)
 add_executable(incidents_test tests/incidents_test.cpp)
 add_executable(router_test tests/router_test.cpp)
 
-target_include_directories(map_graph PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(map_graph PUBLIC ${PROJECT_SOURCE_DIR}/include ../experiment/include)
 
 # pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -24,7 +24,7 @@ target_link_libraries(map_graph pthread)
 target_link_libraries(incident_manager pthread)
 
 # Dependencies
-target_link_libraries(router ims::map_graph ims::incident_manager)
+target_link_libraries(router ims::map_graph ims::incident_manager exp::logger)
 target_link_libraries(map_graph_test ims::map_graph)
 target_link_libraries(map_graph_real ims::map_graph)
 target_link_libraries(incidents_test ims::incident_manager)

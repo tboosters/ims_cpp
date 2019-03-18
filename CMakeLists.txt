@@ -4,5 +4,6 @@ project(ims_cpp)
 set(CMAKE_CXX_STANDARD 11)
 
 add_subdirectory(cpp_server_cppcms)
+add_subdirectory(experiment)
 add_subdirectory(graph_builder)
 add_subdirectory(map_graph)
