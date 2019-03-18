@@ -9,7 +9,7 @@ using namespace std;
 class ExpandedLog
 {
 public:
-    map<unsigned, pair<unsigned, unsigned>> expanded_nodes;
+    map<unsigned, pair<double, double>> expanded_nodes;
     vector<pair<unsigned, unsigned>> expanded_edges;
 };
 

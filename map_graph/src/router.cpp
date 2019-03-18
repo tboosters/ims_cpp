@@ -158,7 +158,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
 
             // log the search space if appicable
             if (log != NULL)
-            {
+            {   
                 log->expanded_nodes[current_node] = make_pair(map_graph->latitude[current_node], map_graph->longitude[current_node]);
                 log->expanded_nodes[next_node] = make_pair(map_graph->latitude[next_node], map_graph->longitude[next_node]);
                 log->expanded_edges.emplace_back(current_node, next_node);
