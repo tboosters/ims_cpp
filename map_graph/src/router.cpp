@@ -87,9 +87,17 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             vector<pair<unsigned, pair<unsigned, time_t>>>,
             greater<pair<unsigned, pair<unsigned, time_t>>>
             > open;
-
     open.push(make_pair(0, make_pair(origin, start_time * 1000))); // Covert start_time to millisecond
     dist[origin] = 0;
+
+    // data structure only for logging
+    priority_queue<
+            pair<unsigned, tuple<unsigned, unsigned, unsigned, unsigned ,unsigned>>,
+            vector<pair<unsigned, tuple<unsigned, unsigned, unsigned, unsigned ,unsigned>>>,
+            greater<pair<unsigned, tuple<unsigned, unsigned, unsigned, unsigned ,unsigned>>>
+            > open_log;
+    open_log.push(make_pair(0, make_tuple(origin, origin, 0, 0, 0)));
+
 
     // process the node u with minimum dist[u]
     while (!open.empty())
@@ -97,6 +105,20 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
         unsigned current_node = open.top().second.first;
         time_t current_node_time = open.top().second.second;
         open.pop();
+
+        // log the search space if appicable
+        if (log != NULL)
+        {   
+            unsigned current_node = get<0>(open_log.top().second);
+            unsigned pass_node = get<1>(open_log.top().second);
+            unsigned g = get<2>(open_log.top().second);
+            unsigned h = get<3>(open_log.top().second);
+            unsigned w = get<4>(open_log.top().second);
+            log->expanded_nodes[pass_node] = make_pair(map_graph->latitude[pass_node], map_graph->longitude[pass_node]);
+            log->expanded_nodes[current_node] = make_pair(map_graph->latitude[current_node], map_graph->longitude[current_node]);
+            log->expanded_edges.emplace_back(pass_node, current_node, g, h, w);
+            open_log.pop();
+        }
 
         // premature end the graph search if target reached
         if (current_node == destination)
@@ -129,6 +151,12 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 path->enter_times[time] = edge;
 
                 time = time + retrieve_realized_weight(edge, time);
+
+                // log final path if appicable
+                if (log != NULL)
+                {
+                    log->path_edges.emplace_back(this_node, next_node);
+                }
             }
             path->end_time = time;
             path->nodes.emplace_back(map_graph->longitude[destination], map_graph->latitude[destination]);
@@ -154,14 +182,12 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
                 dist[next_node] = f;
                 prev[next_node] = current_node;
                 open.push(make_pair(dist[next_node], make_pair(next_node, current_node_time + w)));
-            }
-
-            // log the search space if appicable
-            if (log != NULL)
-            {   
-                log->expanded_nodes[current_node] = make_pair(map_graph->latitude[current_node], map_graph->longitude[current_node]);
-                log->expanded_nodes[next_node] = make_pair(map_graph->latitude[next_node], map_graph->longitude[next_node]);
-                log->expanded_edges.emplace_back(current_node, next_node);
+                
+                // log the search space if applicable
+                if (log != NULL)
+                {
+                    open_log.push(make_pair(dist[next_node], make_tuple(next_node, current_node, g, h, w)));
+                }
             }
         }
     }

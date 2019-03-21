@@ -9,6 +9,7 @@
 #include <map>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 #include "ims/map_graph.h"
 #include "ims/incident_manager.h"
@@ -29,11 +30,14 @@ int main()
     cout << "Initializing Router ..." << endl;
     auto router = new IMS::Router(map_graph, incident_manager);
 
-    float origin_long = 114.127758f;
-    float origin_lat = 22.502621f;
+    //float origin_long = 114.127758f;
+    //float origin_lat = 22.502621f;
+    float origin_long = 114.178089f;
+    float origin_lat = 22.373222f;
     float destination_long = 114.135924f;
     float destination_lat = 22.283366f;
     float raduis = 100;
+    string test_name = "route2";
 
     cout << "Locating origin and destination ..." << endl;
     unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, 100);
@@ -62,7 +66,7 @@ int main()
     delete path;
 
     cout << "Writing to XML ..." << endl;
-    create_xml("route1", log);
+    create_xml(test_name, log);
     cout << "Completed." << endl;
     return 0;
 }
@@ -86,19 +90,39 @@ void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
         unsigned id = node.first;
         double lat = node.second.first;
         double lon = node.second.second;
-        fout << "  <node id=\"" << id << "\" version=\"5\" timestamp=\"2017-08-31T16:06:25Z\" uid=\"0\" user=\"someone\" changeset=\"51620526\" lat=\"" << lat << "\" lon=\"" << lon << "\"/>" << endl;
+        fout << "  <node id=\"" << id << "\" version=\"5\" timestamp=\"2017-08-31T16:06:25Z\" uid=\"0\" user=\"someone\" changeset=\"51620526\" lat=\"" << setprecision(7) << lat << "\" lon=\"" << setprecision(7) << lon << "\"/>" << endl;
     }
 
     // ways
     unsigned id_counter = 10001;
     for (auto edge : log->expanded_edges)
     {
+        unsigned from_node = get<0>(edge);
+        unsigned to_node = get<1>(edge);
+        unsigned g = get<2>(edge);
+        unsigned h = get<3>(edge);
+        unsigned w = get<4>(edge);
+        fout << "  <way id=\"" << id_counter << "\" version=\"1\" timestamp=\"2018-09-17T07:38:42Z\" uid=\"0\" user=\"someone\" changeset=\"62655145\">" << endl;
+        fout << "    <nd ref=\"" << from_node << "\"/>" << endl;
+        fout << "    <nd ref=\"" << to_node << "\"/>" << endl;
+        fout << "    <tag k=\"highway\" v=\"secondary\"/>" << endl;
+        fout << "    <tag k=\"g\" v=\"" << g << "\"/>" << endl;
+        fout << "    <tag k=\"h\" v=\"" << h << "\"/>" << endl;
+        fout << "    <tag k=\"w\" v=\"" << w << "\"/>" << endl;
+        fout << "  </way>" << endl;
+        id_counter++;
+    }
+
+    // final path
+    id_counter = 10000001;
+    for (auto edge : log->path_edges)
+    {
         unsigned from_node = edge.first;
         unsigned to_node = edge.second;
         fout << "  <way id=\"" << id_counter << "\" version=\"1\" timestamp=\"2018-09-17T07:38:42Z\" uid=\"0\" user=\"someone\" changeset=\"62655145\">" << endl;
         fout << "    <nd ref=\"" << from_node << "\"/>" << endl;
         fout << "    <nd ref=\"" << to_node << "\"/>" << endl;
-        fout << "    <tag k=\"highway\" v=\"secondary\"/>" << endl;
+        fout << "    <tag k=\"highway\" v=\"primary\"/>" << endl;
         fout << "  </way>" << endl;
         id_counter++;
     }

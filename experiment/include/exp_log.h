@@ -10,7 +10,9 @@ class ExpandedLog
 {
 public:
     map<unsigned, pair<double, double>> expanded_nodes;
-    vector<pair<unsigned, unsigned>> expanded_edges;
+    vector<tuple<unsigned, unsigned, unsigned, unsigned, unsigned>> expanded_edges;
+
+    vector<pair<unsigned, unsigned>> path_edges; 
 };
 
 
