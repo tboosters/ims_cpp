@@ -165,15 +165,15 @@ void IMSApp::reroute()
     double destination_lat = json_data["coordinates"][1][1].number();
 
     auto old_path = new IMS::Path();
-    old_path->start_time = (time_t) json_data["start_time"].number();
-    old_path->end_time = (time_t) json_data["end_time"].number();
+    old_path->start_time = (time_t) json_data["path"]["start_time"].number();
+    old_path->end_time = (time_t) json_data["path"]["end_time"].number();
 
-    for(auto & coordinates : json_data["nodes"].array())
+    for(auto & coordinates : json_data["path"]["nodes"].array())
     {
         old_path->nodes.emplace_back(coordinates[0].number(), coordinates[1].number());
     }
 
-    for(auto & ete : json_data["enter_times"].object())
+    for(auto & ete : json_data["path"]["enter_times"].object())
     {
         old_path->enter_times[stol(ete.first)] = (unsigned) ete.second.number();
     }
@@ -194,28 +194,19 @@ void IMSApp::reroute()
     time_t now = time(nullptr);
     auto new_path = router->route(current_origin, destination, now);
 
-    /* Determine the better path: if new path reaches destination earlier than old path for at least "threshold" time */
-    // TODO: Remove decision making -> old path should always be disposed as it no longer reflect latest information.
-    IMS::Path * better_path = old_path;
-    time_t threshold = 10 * 60 * 1000;
-    if(old_path->end_time - new_path->end_time >= threshold)
-    {
-        better_path = new_path;
-    }
-
     /* Perform graph update */
-    map_graph->inject_impact_of_routed_path(better_path);
+    map_graph->inject_impact_of_routed_path(new_path);
 
     /* Write route to response */
-    cppcms::json::value response_body = build_path_response_body(better_path);
+    cppcms::json::value response_body = build_path_response_body(new_path);
     response().out() << response_body;
 
     cout << endl << "==== Route ====" << endl;
-    for(auto & n : better_path->nodes)
+    for(auto & n : new_path->nodes)
     {
         cout << n.second << ", " << n.first << endl;
     }
-    printf("Time needed: %.2f minutes\n", (better_path->end_time - better_path->start_time) / 60000.0);
+    printf("Time needed: %.2f minutes\n", (new_path->end_time - new_path->start_time) / 60000.0);
     cout << "===============" << endl;
 
     /* Release memory */
