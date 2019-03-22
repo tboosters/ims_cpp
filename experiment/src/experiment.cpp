@@ -20,37 +20,48 @@ using namespace std;
 
 int main()
 {
-    cout << "==== Experiment ====" << endl;
-    ExpandedLog* log = new ExpandedLog();
-
-    cout << "Initializing MapGraph ..." << endl;
-    auto map_graph = IMS::MapGraph::deserialize_and_initialize("HK.graph");
-    cout << "Initializing IncidentManager ..." << endl;
-    auto incident_manager = new IMS::IncidentManager();
-    cout << "Initializing Router ..." << endl;
-    auto router = new IMS::Router(map_graph, incident_manager);
-
     //float origin_long = 114.127758f;
     //float origin_lat = 22.502621f;
     float origin_long = 114.178089f;
     float origin_lat = 22.373222f;
     float destination_long = 114.135924f;
     float destination_lat = 22.283366f;
-    float raduis = 100;
-    string test_name = "route2";
+    float radius = 100;
+
+    experiment_route("route_4_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+    experiment_route("route_8_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+    experiment_route("route_16_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+    experiment_route("route_32_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+    experiment_route("route_64_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+
+
+    return 0;
+}
+
+void experiment_route(string filename, string graph, float origin_long, float origin_lat, float destination_long, float destination_lat, float radius)
+{
+    cout << "==== Experiment ====" << endl;
+    ExpandedLog* log = new ExpandedLog();
+
+    cout << "Initializing MapGraph ..." << endl;
+    auto map_graph = IMS::MapGraph::deserialize_and_initialize(graph);
+    cout << "Initializing IncidentManager ..." << endl;
+    auto incident_manager = new IMS::IncidentManager();
+    cout << "Initializing Router ..." << endl;
+    auto router = new IMS::Router(map_graph, incident_manager);
 
     cout << "Locating origin and destination ..." << endl;
-    unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, 100);
-    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, 100);
+    unsigned origin = map_graph->find_nearest_node_of_location(origin_long, origin_lat, radius);
+    unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, radius);
     if(origin == RoutingKit::invalid_id)
     {
         cout << "No node within " << to_string(100) << "m from origin position." << endl;
-        return 0;
+        return;
     }
     if(destination == RoutingKit::invalid_id)
     {
         cout << "No node within " << to_string(100) << "m from destination position." << endl;
-        return 0;
+        return;
     }
 
     /* Perform routing */
@@ -62,13 +73,18 @@ int main()
     printf("Path: Time needed: %.2f minutes\n", (path->end_time - path->start_time) / 60000.0);
     cout << "Path: " << log->expanded_nodes.size() << " nodes and " << log->expanded_edges.size() << " edges expanded" << endl;
 
-    /* Release memory */
-    delete path;
-
     cout << "Writing to XML ..." << endl;
-    create_xml(test_name, log);
+    create_xml(filename, log);
+
+    /* Release memory */
+    cout << "Releasing ..." << endl;
+    delete path;
+    delete log;
+    delete router;
+    delete incident_manager;
+
     cout << "Completed." << endl;
-    return 0;
+
 }
 
 void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
@@ -82,7 +98,7 @@ void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
     fout << "<osm version=\"0.6\" generator=\"Osmosis 0.5\">" << endl;
 
     // bound
-    fout << "   <bounds minlon=\"114.11260\" minlat=\"22.49460\" maxlon=\"114.14070\" maxlat=\"22.51120\" origin=\"CGImap 0.6.1 (2000 thorn-03.openstreetmap.org)\"/>" << endl;
+    fout << "   <bounds minlon=\"113.813\" minlat=\"22.133\" maxlon=\"114.506\" maxlat=\"22.572\" origin=\"CGImap 0.6.1 (2000 thorn-03.openstreetmap.org)\"/>" << endl;
 
     // nodes
     for (auto node : log->expanded_nodes)
