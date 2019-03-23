@@ -229,7 +229,7 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
         }
 
         // When vehicle is in the edge
-        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first != leave_time; intermediate++)
+        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first < leave_time; intermediate++)
         {
             intermediate->second += density_delta;
         }
@@ -264,7 +264,7 @@ void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
         current_density[edge][enter_time] -= density_delta;
 
         // When vehicle is in the edge
-        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first != leave_time; intermediate++)
+        for(auto intermediate = ++(current_density[edge].find(enter_time)); intermediate->first < leave_time; intermediate++)
         {
             intermediate->second -= density_delta;
         }
