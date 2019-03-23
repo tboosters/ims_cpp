@@ -20,27 +20,32 @@ using namespace std;
 
 int main()
 {
-    //float origin_long = 114.127758f;
-    //float origin_lat = 22.502621f;
-    float origin_long = 114.178089f;
-    float origin_lat = 22.373222f;
-    float destination_long = 114.135924f;
-    float destination_lat = 22.283366f;
+    float ss_origin_long = 114.127758f;
+    float ss_origin_lat = 22.502621f;
+    float tp_origin_long = 114.178089f;
+    float tp_origin_lat = 22.373222f;
+    float hku_destination_long = 114.135924f;
+    float hku_destination_lat = 22.283366f;
     float radius = 100;
 
-    experiment_route("route_4_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
-    experiment_route("route_8_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
-    experiment_route("route_16_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
-    experiment_route("route_32_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
-    experiment_route("route_64_3", "HK_4_3.graph", origin_long, origin_lat, destination_long, destination_lat, radius);
+    experiment_route("ss_hku_route_4_3", "HK_4_3.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_8_3", "HK_8_3.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_8_4", "HK_8_4.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_8_5", "HK_8_5_new.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_16_3", "HK_16_3.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_32_3", "HK_32_3.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_32_4", "HK_32_4.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("ss_hku_route_64_3", "HK_64_3.graph", ss_origin_long, ss_origin_lat, hku_destination_long, hku_destination_lat, radius);
 
+    experiment_route("tp_hku_route_32_4", "HK_32_4.graph", tp_origin_long, tp_origin_lat, hku_destination_long, hku_destination_lat, radius);
+    experiment_route("tp_hku_route_64_3", "HK_64_3.graph", tp_origin_long, tp_origin_lat, hku_destination_long, hku_destination_lat, radius);
 
     return 0;
 }
 
 void experiment_route(string filename, string graph, float origin_long, float origin_lat, float destination_long, float destination_lat, float radius)
 {
-    cout << "==== Experiment ====" << endl;
+    cout << "==== Experiment " << filename << " ====" << endl;
     ExpandedLog* log = new ExpandedLog();
 
     cout << "Initializing MapGraph ..." << endl;
@@ -103,7 +108,7 @@ void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
     // nodes
     for (auto node : log->expanded_nodes)
     {
-        unsigned id = node.first;
+        unsigned id = node.first + 1;
         double lat = node.second.first;
         double lon = node.second.second;
         fout << "  <node id=\"" << id << "\" version=\"5\" timestamp=\"2017-08-31T16:06:25Z\" uid=\"0\" user=\"someone\" changeset=\"51620526\" lat=\"" << setprecision(7) << lat << "\" lon=\"" << setprecision(7) << lon << "\"/>" << endl;
@@ -113,18 +118,28 @@ void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
     unsigned id_counter = 10001;
     for (auto edge : log->expanded_edges)
     {
-        unsigned from_node = get<0>(edge);
-        unsigned to_node = get<1>(edge);
+        unsigned from_node = get<0>(edge) + 1;
+        unsigned to_node = get<1>(edge) + 1;
         unsigned g = get<2>(edge);
         unsigned h = get<3>(edge);
         unsigned w = get<4>(edge);
+        unsigned f = get<5>(edge);
+
         fout << "  <way id=\"" << id_counter << "\" version=\"1\" timestamp=\"2018-09-17T07:38:42Z\" uid=\"0\" user=\"someone\" changeset=\"62655145\">" << endl;
         fout << "    <nd ref=\"" << from_node << "\"/>" << endl;
         fout << "    <nd ref=\"" << to_node << "\"/>" << endl;
         fout << "    <tag k=\"highway\" v=\"secondary\"/>" << endl;
-        fout << "    <tag k=\"g\" v=\"" << g << "\"/>" << endl;
-        fout << "    <tag k=\"h\" v=\"" << h << "\"/>" << endl;
-        fout << "    <tag k=\"w\" v=\"" << w << "\"/>" << endl;
+        fout << "    <tag k=\"route:g\" v=\"" << g << "\"/>" << endl;
+        fout << "    <tag k=\"route:h\" v=\"" << h << "\"/>" << endl;
+        fout << "    <tag k=\"route:w\" v=\"" << w << "\"/>" << endl;
+        fout << "    <tag k=\"route:f\" v=\"" << f << "\"/>" << endl;
+
+        fout << "    <tag k=\"partition_at_level:0\" v=\"" << get<6>(edge) << "\"/>" << endl;
+        fout << "    <tag k=\"partition_at_level:1\" v=\"" << get<7>(edge) << "\"/>" << endl;
+        fout << "    <tag k=\"partition_at_level:2\" v=\"" << get<8>(edge) << "\"/>" << endl;
+        fout << "    <tag k=\"partition_at_level:3\" v=\"" << get<9>(edge) << "\"/>" << endl;
+        fout << "    <tag k=\"partition_at_level:4\" v=\"" << get<10>(edge) << "\"/>" << endl;
+        
         fout << "  </way>" << endl;
         id_counter++;
     }
@@ -133,8 +148,8 @@ void create_xml(string filename, ExpandedLog* log) // <from_node, to_node>
     id_counter = 10000001;
     for (auto edge : log->path_edges)
     {
-        unsigned from_node = edge.first;
-        unsigned to_node = edge.second;
+        unsigned from_node = edge.first + 1;
+        unsigned to_node = edge.second + 1;
         fout << "  <way id=\"" << id_counter << "\" version=\"1\" timestamp=\"2018-09-17T07:38:42Z\" uid=\"0\" user=\"someone\" changeset=\"62655145\">" << endl;
         fout << "    <nd ref=\"" << from_node << "\"/>" << endl;
         fout << "    <nd ref=\"" << to_node << "\"/>" << endl;

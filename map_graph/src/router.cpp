@@ -30,6 +30,7 @@ unsigned IMS::Router::retrieve_future_weight(const unsigned &from_node, const un
     unsigned to_partition = (*layers)[layers->size()-1][to_node];
     for (unsigned i = layers->size()-2; i > 0; i--)
     { 
+        //cout << "checking i: " << i << ", " << (*layers)[i][from_partition] << " == " << (*layers)[i][to_partition] << endl;
         if ((*layers)[i][from_partition] != (*layers)[i][to_partition])
         {
             //cout << "i: " << i << ", from: " << from_partition << ", to: " << to_partition << endl;
@@ -114,9 +115,27 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             unsigned g = get<2>(open_log.top().second);
             unsigned h = get<3>(open_log.top().second);
             unsigned w = get<4>(open_log.top().second);
+            unsigned f = g + h + w;
+
+            unsigned layer_info[5];
+            for (int i = 0; i < 5; i++)
+            {
+                layer_info[i] = -1;
+            }
+            unsigned l = current_node;
+            //unsigned l = (*(map_graph->layers))[layers->size()-1][current_node];
+            for (unsigned i = map_graph->layers->size()-1; i > 0; i--)
+            { 
+                //cout << i << ", " << l << endl;
+                layer_info[i] = l;
+                //layer_info.emplace_back(i, (*(map_graph->layers))[i][l]);
+                // move up one level       
+                l = (*(map_graph->layers))[i][l];
+            }        
+
             log->expanded_nodes[pass_node] = make_pair(map_graph->latitude[pass_node], map_graph->longitude[pass_node]);
             log->expanded_nodes[current_node] = make_pair(map_graph->latitude[current_node], map_graph->longitude[current_node]);
-            log->expanded_edges.emplace_back(pass_node, current_node, g, h, w);
+            log->expanded_edges.emplace_back(pass_node, current_node, g, h, w, f, layer_info[0], layer_info[1], layer_info[2], layer_info[3], layer_info[4]);
             open_log.pop();
         }
 
@@ -177,16 +196,17 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             unsigned w = retrieve_realized_weight(current_edge, current_node_time);
 
             unsigned f = g + h + w;
-            if (dist[next_node] > f)
+            if (dist[next_node] > g + w)
             {
-                dist[next_node] = f;
+                dist[next_node] = g + w;
                 prev[next_node] = current_node;
-                open.push(make_pair(dist[next_node], make_pair(next_node, current_node_time + w)));
+                //open.push(make_pair(dist[next_node], make_pair(next_node, current_node_time + w)));
+                open.push(make_pair(f, make_pair(next_node, current_node_time + w)));
                 
                 // log the search space if applicable
                 if (log != NULL)
                 {
-                    open_log.push(make_pair(dist[next_node], make_tuple(next_node, current_node, g, h, w)));
+                    open_log.push(make_pair(f, make_tuple(next_node, current_node, g, h, w)));
                 }
             }
         }
