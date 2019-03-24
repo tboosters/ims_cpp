@@ -207,7 +207,7 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
         edge = enter_time_edge.second;
         enter_time = enter_time_edge.first;
         leave_time = next_enter_time_edge == path->enter_times.end()? path->end_time : next_enter_time_edge->first;
-        density_delta = 1.0 / geo_distance[edge];
+        density_delta = geo_distance[edge] == 0? max_density : 1.0 / geo_distance[edge];
 
         // When vehicle leaves edge, restore density
         // Case where leave_time exists can be skipped as traffic density will be retained as the same anyways
@@ -258,7 +258,7 @@ void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
         edge = enter_time_edge.second;
         enter_time = enter_time_edge.first;
         leave_time = next_enter_time_edge == path->enter_times.end()? path->end_time : next_enter_time_edge->first;
-        density_delta = 1.0 / geo_distance[edge];
+        density_delta = geo_distance[edge] == 0? max_density : 1.0 / geo_distance[edge];
 
         // When vehicle enters edge
         current_density[edge][enter_time] -= density_delta;
