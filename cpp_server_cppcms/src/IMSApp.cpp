@@ -201,23 +201,31 @@ void IMSApp::reroute()
     auto new_path = router->route(current_origin, destination, now);
 
     /* Perform graph update */
-    map_graph->inject_impact_of_routed_path(new_path);
-
-    /* Write route to response */
-    cppcms::json::value response_body = build_path_response_body(new_path);
-    response().out() << response_body;
-
-    cout << endl << "==== Route ====" << endl;
-    for(auto & n : new_path->nodes)
+    if(new_path != nullptr)
     {
-        cout << n.second << ", " << n.first << endl;
-    }
-    printf("Time needed: %.2f minutes\n", (new_path->end_time - new_path->start_time) / 60000.0);
-    cout << "===============" << endl;
+        map_graph->inject_impact_of_routed_path(new_path);
 
-    /* Release memory */
-    delete old_path;
-    delete new_path;
+        /* Write route to response */
+        cppcms::json::value response_body = build_path_response_body(new_path);
+        response().out() << response_body;
+
+        cout << endl << "==== Route ====" << endl;
+        for(auto & n : new_path->nodes)
+        {
+            cout << n.second << ", " << n.first << endl;
+        }
+        printf("Time needed: %.2f minutes\n", (new_path->end_time - new_path->start_time) / 60000.0);
+        cout << "===============" << endl;
+
+        /* Release memory */
+        delete old_path;
+        delete new_path;
+    }
+    else
+    {
+        printf("NULL PATH: %f, %f - %f, %f\n", current_lat, current_long, destination_lat, destination_long);
+        response().make_error_response(400, "Path not found.");
+    }
 }
 
 void IMSApp::inject_incident()
