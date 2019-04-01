@@ -121,28 +121,34 @@ void IMSApp::route()
 
     /* Perform routing */
     time_t now = time(nullptr);
-//    atomic_lock.lock();
     IMS::Path * path = router->route(origin, destination, now);
-
     /* Perform graph update */
-    map_graph->inject_impact_of_routed_path(path);
-//    atomic_lock.unlock();
 
-    /* Write route to response */
-    cppcms::json::value response_body = build_path_response_body(path);
-    response().out() << response_body;
-
-    cout << endl << "==== Route ====" << endl;
-    cout.precision(10);
-    for(auto & n : path->nodes)
+    if(path != nullptr)
     {
-        cout << n.second << ", " << n.first << endl;
-    }
-    printf("Time needed: %.2f minutes\n", (path->end_time - path->start_time) / 60000.0);
-    cout << "===============" << endl;
+        map_graph->inject_impact_of_routed_path(path);
 
-    /* Release memory */
-    delete path;
+        /* Write route to response */
+        cppcms::json::value response_body = build_path_response_body(path);
+        response().out() << response_body;
+
+        cout << endl << "==== Route ====" << endl;
+        cout.precision(10);
+        for(auto & n : path->nodes)
+        {
+            cout << n.second << ", " << n.first << endl;
+        }
+        printf("Time needed: %.2f minutes\n", (path->end_time - path->start_time) / 60000.0);
+        cout << "===============" << endl;
+
+        /* Release memory */
+        delete path;
+    }
+    else
+    {
+        printf("NULL PATH: %f, %f - %f, %f\n", origin_lat, origin_long, destination_lat, destination_long);
+        response().out() << "NULL";
+    }
 }
 
 void IMSApp::reroute()
