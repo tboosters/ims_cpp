@@ -147,7 +147,7 @@ void IMSApp::route()
     else
     {
         printf("NULL PATH: %f, %f - %f, %f\n", origin_lat, origin_long, destination_lat, destination_long);
-        response().out() << "NULL";
+        response().make_error_response(400, "Path not found.");
     }
 }
 
