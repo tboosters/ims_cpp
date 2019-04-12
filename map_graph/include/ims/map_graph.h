@@ -54,7 +54,7 @@ namespace IMS
         vector<unsigned> head;
         vector<unsigned> first_out;
         vector<unsigned> geo_distance; // meter
-        vector<unsigned> default_travel_time; // seconds
+        vector<unsigned> default_travel_time; // milliseconds
         InversedGraph* inversed;
         RoutingKit::GeoPositionToNode map_geo_position; // Reversed geocoding index
 
