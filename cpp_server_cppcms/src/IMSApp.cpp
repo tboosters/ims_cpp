@@ -63,6 +63,8 @@ cppcms::json::value build_path_response_body(const IMS::Path *path)
     return response_body;
 }
 
+boost::mutex IMSApp::atomic_lock;
+
 IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentManager *incident_manager) : cppcms::application(srv)
 {
     this->map_graph = map_graph;
@@ -120,6 +122,8 @@ void IMSApp::route()
     }
 
     /* Perform routing */
+    boost::lock_guard<boost::mutex> lock(IMS::IMSApp::atomic_lock);
+
     time_t now = time(nullptr);
     IMS::Path * path = router->route(origin, destination, now);
     /* Perform graph update */
@@ -184,9 +188,6 @@ void IMSApp::reroute()
         old_path->enter_times[stol(ete.first)] = (unsigned) ete.second.number();
     }
 
-    /* Remove old path from graph's density information */
-    map_graph->remove_impact_of_routed_path(old_path);
-
     /* Reroute from current location */
     unsigned destination = map_graph->find_nearest_node_of_location(destination_long, destination_lat, RADIUS);
 
@@ -196,6 +197,10 @@ void IMSApp::reroute()
         response().make_error_response(400, "No node within " + to_string(RADIUS) + "m from current position.");
         return;
     }
+
+    boost::lock_guard<boost::mutex> lock(IMS::IMSApp::atomic_lock);
+    /* Remove old path from graph's density information */
+    map_graph->remove_impact_of_routed_path(old_path);
 
     time_t now = time(nullptr);
     auto new_path = router->route(current_origin, destination, now);

@@ -194,7 +194,8 @@ double IMS::MapGraph::find_current_density(unsigned edge, time_t enter_time)
 void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
 {
     // Lock exclusive writer access
-    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_to_unique_lock<boost::shared_mutex> unique_lock(writer_lock);
 
     unsigned edge;
     time_t enter_time, leave_time;
@@ -209,12 +210,17 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
         leave_time = next_enter_time_edge == path->enter_times.end()? path->end_time : next_enter_time_edge->first;
         density_delta = geo_distance[edge] == 0? max_density : 1.0 / geo_distance[edge];
 
+        if(enter_time == 0 || leave_time == 0)
+        {
+            cout << "gere";
+        }
+
         // When vehicle leaves edge, restore density
         // Case where leave_time exists can be skipped as traffic density will be retained as the same anyways
         auto before_leave_time = current_density[edge].lower_bound(leave_time);
         if(before_leave_time->first != leave_time)
         {
-            current_density[edge][leave_time] = (--before_leave_time)->second;
+            current_density[edge].insert(make_pair(leave_time, (--before_leave_time)->second));
         }
 
         // When vehicle enters edge
@@ -225,7 +231,7 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
         }
         else
         {
-            current_density[edge][enter_time] = (--before_enter_time)->second + density_delta;
+            current_density[edge].insert(make_pair(enter_time, (--before_enter_time)->second + density_delta));
         }
 
         // When vehicle is in the edge
@@ -245,7 +251,8 @@ void IMS::MapGraph::inject_impact_of_routed_path(IMS::Path *path)
 void IMS::MapGraph::remove_impact_of_routed_path(IMS::Path *path)
 {
     // Lock exclusive writer access
-    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_to_unique_lock<boost::shared_mutex> unique_lock(writer_lock);
 
     unsigned edge;
     time_t enter_time, leave_time;

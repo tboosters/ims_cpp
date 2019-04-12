@@ -2,6 +2,7 @@
 
 #include <cppcms/applications_pool.h>
 #include <cppcms/service.h>
+#include <csignal>
 
 #include "utils.h"
 #include "IMSApp.h"
@@ -47,6 +48,7 @@ int main(int argc, char ** argv)
         cppcms::service srv(argc, argv);
         srv.applications_pool().mount(cppcms::applications_factory<IMS::IMSApp>(map_graph, incident_manager));
         cout << "Server starting at 8080..." << endl;
+        cout << "With" << endl;
         srv.run();
     }
     catch (std::exception const &e)

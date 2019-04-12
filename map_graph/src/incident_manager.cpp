@@ -24,7 +24,8 @@ using namespace std;
 unsigned IMS::IncidentManager::add_incident(vector<unsigned> affected_edges, unsigned impact)
 {
     // Lock exclusive writer access
-    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_to_unique_lock<boost::shared_mutex> unique_lock(writer_lock);
 
     unsigned incident_id = num_of_incident;
     incidents[incident_id] = impact;
@@ -45,7 +46,8 @@ unsigned IMS::IncidentManager::add_incident(vector<unsigned> affected_edges, uns
 unsigned IMS::IncidentManager::remove_incident(unsigned incident_id)
 {
     // Lock exclusive writer access
-    boost::unique_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_lock<boost::shared_mutex> writer_lock(access);
+    boost::upgrade_to_unique_lock<boost::shared_mutex> unique_lock(writer_lock);
 
     unsigned num_of_incidents_removed = incidents.erase(incident_id);
 

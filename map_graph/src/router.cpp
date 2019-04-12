@@ -64,9 +64,9 @@ unsigned int IMS::Router::retrieve_realized_weight(const unsigned &edge, const t
 {
     // travel-time w.r.t. current traffic density ONLY
     double occupancy = map_graph->find_current_density(edge, enter_time) / map_graph->max_density;
-    if(occupancy >= 1)
+    if(occupancy >= 0.8)
     {
-        return JAMMED_WEIGHT;
+        return 5 * map_graph->default_travel_time[edge];
     }
 
     double basic_weight = map_graph->default_travel_time[edge] / (1 - occupancy);
@@ -194,6 +194,7 @@ IMS::Path* IMS::Router::route(const unsigned &origin, const unsigned &destinatio
             unsigned g = dist[current_node];
             unsigned h = retrieve_future_weight(next_node, destination);
             unsigned w = retrieve_realized_weight(current_edge, current_node_time);
+//            unsigned w = map_graph->default_travel_time[current_edge];
 
             unsigned f = g + h + w;
             if (dist[next_node] > g + w)
