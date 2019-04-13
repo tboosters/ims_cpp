@@ -1,3 +1,11 @@
+/*
+ * Backend Server Application. Serves web API endpoints for routing and incident management.
+ * Keeps reference to MapGraph, IncidentManager and Router.
+ * Libraries: CPPCMS
+ * Version: 1.0
+ * Author: Terence Chow
+ */
+
 #include <random>
 #include <fstream>
 #include <vector>
@@ -10,7 +18,6 @@
 #include <sstream>
 #include <cstdlib>
 
-#include "utils.h"
 #include "IMSApp.h"
 #include "ims/map_graph.h"
 #include "ims/incident_manager.h"
@@ -20,7 +27,11 @@
 using namespace std;
 using namespace IMS;
 
-// Util function for handling JSON
+/* Utility function for extracting JSON data from raw request body.
+ *
+ * Parameter(s): pair<void *,size_t> raw_post_data
+ * Returns: cppcms::json::value: extracted JSON data
+ */
 cppcms::json::value extract_json_data(pair<void *,size_t> raw_post_data) throw (booster::invalid_argument)
 {
     cppcms::json::value json_data;
@@ -42,7 +53,11 @@ cppcms::json::value extract_json_data(pair<void *,size_t> raw_post_data) throw (
     return json_data;
 }
 
-// Util function for building response body with IMS::Path
+/* Utility function for building JSON object to be returned for a found Path.
+ *
+ * Parameter(s): const IMS::Path *path
+ * Returns: cppcms::json::value: built path in JSON
+ */
 cppcms::json::value build_path_response_body(const IMS::Path *path)
 {
     cppcms::json::value response_body;
@@ -63,8 +78,16 @@ cppcms::json::value build_path_response_body(const IMS::Path *path)
     return response_body;
 }
 
+// Initialize static atomic_lock
 boost::mutex IMSApp::atomic_lock;
 
+
+/* Constructor of IMSApp class.
+ * Initializes essential class fields. Assign handler functions to corresponding URL endpoints.
+ *
+ * Parameter(s): const IMS::Path *path
+ * Returns: cppcms::json::value: built path in JSON
+ */
 IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentManager *incident_manager) : cppcms::application(srv)
 {
     this->map_graph = map_graph;
@@ -81,6 +104,11 @@ IMSApp::IMSApp(cppcms::service &srv, IMS::MapGraph *map_graph, IMS::IncidentMana
     dispatcher().map("DELETE", "/incident", &IMSApp::remove_incident, this);
 }
 
+/* Dev-only endpoint for checking basic information of loaded MapGraph.
+ *
+ * Parameter(s): NIL
+ * Returns: when request is done.
+ */
 void IMSApp::check_graph()
 {
     response().out() << "Node Count: " << map_graph->latitude.size();
@@ -88,6 +116,16 @@ void IMSApp::check_graph()
     response().out() << "Edge Count: " << map_graph->head.size();
 }
 
+/* Handler function for POST /route.
+ * Takes request body -> Finds nearest nodes in MapGraph -> Route -> Return path -> Update.
+ * Requires atomic_lock before entering Route and Update.
+ *
+ * Parameter(s): JSON object with format:
+ * {
+ *   "coordinates": [[longitude, latitude], [longitude, latitude]]
+ * }
+ * Returns: Found path to requester, error on no nodes / path found.
+ */
 void IMSApp::route()
 {
     /* Take POST JSON body */
@@ -155,6 +193,17 @@ void IMSApp::route()
     }
 }
 
+/* Handler function for POST /reroute.
+ * Takes request body -> Remove path from Current Density -> Finds nearest nodes in MapGraph -> Route -> Return path -> Update.
+ * Requires atomic_lock before entering Route and Update.
+ *
+ * Parameter(s): JSON object with format:
+ * {
+ *   "coordinates": [[longitude, latitude], [longitude, latitude]],
+ *   <original path>
+ * }
+ * Returns: Found path to requester, error on no nodes / path found.
+ */
 void IMSApp::reroute()
 {
     /* Take POST JSON body */
@@ -233,6 +282,16 @@ void IMSApp::reroute()
     }
 }
 
+/* Handler function for POST /incident.
+ * Takes request body -> Finds affected edges in MapGraph -> Inject incident -> Return incident ID.
+ *
+ * Parameter(s): JSON object with format:
+ * {
+ *   "location": [longitude, latitude],
+ *   "impact": impact on travelling time in milliseconds
+ * }
+ * Returns: incident ID,  error on no edge found.
+ */
 void IMSApp::inject_incident()
 {
     /* Take POST JSON body */
@@ -268,6 +327,14 @@ void IMSApp::inject_incident()
     response().out() << response_body;
 }
 
+
+/* Handler function for DELETE /incident.
+ * Reads request parameter -> Removes incidnet -> Return deletion status.
+ *
+ * Request URL: DELETE /incident?incident=<incident ID>
+ *
+ * Returns: success status code,  error on no incident found.
+ */
 void IMSApp::remove_incident()
 {
     /* Take URL parameter */

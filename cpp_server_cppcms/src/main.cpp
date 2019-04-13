@@ -1,16 +1,36 @@
 #include <string>
+#include <unistd.h>
 
 #include <cppcms/applications_pool.h>
 #include <cppcms/service.h>
 #include <csignal>
 
-#include "utils.h"
 #include "IMSApp.h"
 #include "ims/map_graph.h"
 
 using namespace std;
 
-/* Helper function to get MapGraph file path */
+/* Utility function for finding excution path of this application instance.
+ *
+ * Parameter(s): NIL
+ * Returns: string: Execution Path of the application instance
+ */
+string get_exec_dir()
+{
+    char buffer[FILENAME_MAX];
+    readlink("/proc/self/exe", buffer, FILENAME_MAX);
+    string full_path(buffer);
+
+    /* Get dir name */
+    int pos = full_path.rfind('/');
+    return full_path.substr(0, pos);
+}
+
+/* Helper function to get MapGraph file path.
+ *
+ * Parameter(s): NIL
+ * Returns: string: Path of MapGraph file.
+ */
 string get_map_file_path(const int & argc, char ** argv) {
     if(argc > 3)
     {
@@ -34,7 +54,11 @@ string get_map_file_path(const int & argc, char ** argv) {
     }
 }
 
-/* Driver function of the server */
+/* Driver function of the server.
+ *
+ * Parameter(s): NIL
+ * Returns: when server is shut down.
+ */
 int main(int argc, char ** argv)
 {
     string map_file_path = get_map_file_path(argc, argv);

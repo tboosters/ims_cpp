@@ -1,6 +1,9 @@
-//
-// Created by terchow on 12/5/18.
-//
+/*
+ * Header file for IMSApp
+ * Libraries: CPPCMS
+ * Version: 1.0
+ * Author: Terence Chow
+ */
 
 #ifndef PROJECT_IMSAPP_H
 #define PROJECT_IMSAPP_H
