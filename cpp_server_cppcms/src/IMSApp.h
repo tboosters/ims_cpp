@@ -30,7 +30,7 @@ namespace IMS
         IMS::Router *router;
 
         const float RADIUS = 100;
-        const float OFFSET = 0.002;
+        const float OFFSET = 0.0008;
 
         // Dev url for checking graph
         void check_graph();
